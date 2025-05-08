@@ -213,7 +213,23 @@ export default function NavigationBar() {
                   color: 'white'
                 }}
               >
-                Home
+                Posts
+              </Button>
+              <Button
+                color="inherit"
+                component={Link}
+                to="/workout-plans"
+                sx={{ textTransform: 'none', display: { xs: 'none', md: 'inline-flex' }, color: '#fff' }}
+              >
+                Workouts
+              </Button>
+              <Button
+                color="inherit"
+                component={Link}
+                to="/meal-plans"
+                sx={{ textTransform: 'none', display: { xs: 'none', md: 'inline-flex' }, color: '#fff' }}
+              >
+                Meal Plans
               </Button>
               <IconButton
                 color="inherit"
