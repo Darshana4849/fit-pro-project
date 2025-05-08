@@ -13,6 +13,10 @@ import UserProfilePage from './pages/UserProfilePage/UserProfilePage';
 import SearchPage from './pages/SearchPage/SearchPage';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import WorkoutPlanList from './pages/WorkoutPlans/WorkoutPlanList';
+import WorkoutPlanDetail from './pages/WorkoutPlans/WorkoutPlanDetail';
+import WorkoutPlanForm from './components/WorkoutPlan/WorkoutPlanForm';
+import CreateEditWorkoutPlan from './pages/WorkoutPlans/CreateEditWorkoutPlanPage';
 
 function App() {
   return (
@@ -31,6 +35,12 @@ function App() {
             <Route path="/connections" element={<ConnectionsPage />} />
             <Route path="/profile/:id" element={<UserProfilePage />} />
             <Route path="/search" element={<SearchPage />} />
+
+            <Route path="/workout-plans" element={<WorkoutPlanList />} />
+            <Route path="/workout-plans/create" element={<CreateEditWorkoutPlan />} />
+            <Route path="/workout-plans/:id" element={<WorkoutPlanDetail />} />
+            <Route path="/workout-plans/:id/edit" element={<CreateEditWorkoutPlan />} />
+            <Route path="/workout-plans-form" element={<WorkoutPlanForm />} />
           </Routes>
         </Router>
       </NotificationProvider>
