@@ -17,6 +17,10 @@ import WorkoutPlanList from './pages/WorkoutPlans/WorkoutPlanList';
 import WorkoutPlanDetail from './pages/WorkoutPlans/WorkoutPlanDetail';
 import WorkoutPlanForm from './components/WorkoutPlan/WorkoutPlanForm';
 import CreateEditWorkoutPlan from './pages/WorkoutPlans/CreateEditWorkoutPlanPage';
+import MealPlanList from './pages/MealPlans/MealPlanList';
+import MealPlanDetail from './pages/MealPlans/MealPlanDetail';
+import MealPlanForm from './components/MealPlan/MealPlanForm';
+import CreateEditMealPlan from './pages/MealPlans/CreateEditMealPlanPage';
 
 function App() {
   return (
@@ -41,6 +45,12 @@ function App() {
             <Route path="/workout-plans/:id" element={<WorkoutPlanDetail />} />
             <Route path="/workout-plans/:id/edit" element={<CreateEditWorkoutPlan />} />
             <Route path="/workout-plans-form" element={<WorkoutPlanForm />} />
+
+            <Route path="/meal-plans" element={<MealPlanList />} />
+            <Route path="/meal-plans/create" element={<CreateEditMealPlan />} />
+            <Route path="/meal-plans/:id" element={<MealPlanDetail />} />
+            <Route path="/meal-plans/:id/edit" element={<CreateEditMealPlan />} />
+            <Route path="/meal-plans-form" element={<MealPlanForm />} />
           </Routes>
         </Router>
       </NotificationProvider>
