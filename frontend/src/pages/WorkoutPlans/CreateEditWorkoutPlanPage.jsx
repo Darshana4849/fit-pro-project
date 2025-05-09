@@ -202,7 +202,6 @@ const CreateEditWorkoutPlan = () => {
                     value={formData.durationWeeks}
                     onChange={handleInputChange}
                     min="1"
-                    required
                     className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 text-white"
                     placeholder="e.g., 4 weeks"
                   />
@@ -325,7 +324,6 @@ const CreateEditWorkoutPlan = () => {
                   name="name"
                   value={newExercise.name}
                   onChange={handleExerciseInputChange}
-                  required
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 text-white placeholder-gray-400"
                   placeholder="e.g., Squats, Push-ups, Planks"
                 />
