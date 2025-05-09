@@ -21,7 +21,7 @@ import MealPlanList from './pages/MealPlans/MealPlanList';
 import MealPlanDetail from './pages/MealPlans/MealPlanDetail';
 import MealPlanForm from './components/MealPlan/MealPlanForm';
 import CreateEditMealPlan from './pages/MealPlans/CreateEditMealPlanPage';
-import WorkoutProgress from './pages/WorkoutProgress/WorkoutProgress';
+// import WorkoutProgress from './pages/WorkoutProgress/WorkoutProgress';
 
 function App() {
   return (
@@ -53,7 +53,7 @@ function App() {
             <Route path="/meal-plans/:id/edit" element={<CreateEditMealPlan />} />
             <Route path="/meal-plans-form" element={<MealPlanForm />} />
 
-            <Route path="/workout-progress" element={<WorkoutProgress />} />
+            {/* <Route path="/workout-progress" element={<WorkoutProgress />} /> */}
           </Routes>
         </Router>
       </NotificationProvider>
