@@ -310,7 +310,7 @@ const WorkoutPlanList = () => {
                     </button>
                     
                     <Link
-                      to={`/workout-plans/${plan.id}/start`}
+                      to={`/workout-plans/${plan.id}`}
                       className={`px-4 py-3 ${
                         darkMode
                           ? 'bg-green-600 hover:bg-green-700'
