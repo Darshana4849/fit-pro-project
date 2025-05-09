@@ -41,7 +41,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { likePost, unlikePost } from '../../services/interactionService';
 import CommentSection from './CommentSection';
 
-export default function PostCard({ post, onEdit, onDelete }) {
+export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
@@ -145,14 +145,89 @@ export default function PostCard({ post, onEdit, onDelete }) {
     console.log('Link copied to clipboard');
   };
 
+  // Styles based on dark mode
+  const styles = {
+    card: {
+      mb: 2,
+      borderRadius: 2,
+      boxShadow: darkMode ? '0px 2px 10px rgba(0,0,0,0.5)' : '0px 2px 10px rgba(0,0,0,0.1)',
+      bgcolor: darkMode ? 'rgba(30, 30, 30, 0.8)' : '#ffffff',
+      color: darkMode ? 'white' : 'text.primary',
+      transition: 'background-color 0.3s ease, box-shadow 0.3s ease'
+    },
+    cardHeader: {
+      '& .MuiCardHeader-action': {
+        alignSelf: 'center'
+      }
+    },
+    subheader: {
+      color: darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'
+    },
+    cardContent: {
+      pt: 0,
+      color: darkMode ? 'white' : 'text.primary'
+    },
+    mediaContainer: {
+      position: 'relative',
+      bgcolor: darkMode ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.05)'
+    },
+    navButton: {
+      position: 'absolute',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      bgcolor: darkMode ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)',
+      color: 'white',
+      '&:hover': { 
+        bgcolor: darkMode ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.5)',
+        color: 'primary.main'
+      }
+    },
+    cardActions: {
+      bgcolor: darkMode ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.05)'
+    },
+    menuPaper: {
+      bgcolor: darkMode ? 'rgba(30, 30, 30, 0.9)' : '#ffffff',
+      color: darkMode ? 'white' : 'text.primary',
+      '& .MuiMenuItem-root': {
+        '&:hover': {
+          bgcolor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)'
+        }
+      }
+    },
+    popoverPaper: {
+      bgcolor: darkMode ? 'rgba(30, 30, 30, 0.95)' : '#ffffff',
+      color: darkMode ? 'white' : 'text.primary',
+      boxShadow: darkMode ? '0px 4px 20px rgba(0,0,0,0.5)' : '0px 4px 20px rgba(0,0,0,0.1)'
+    },
+    listItem: {
+      '&:hover': {
+        bgcolor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)'
+      }
+    },
+    divider: {
+      bgcolor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'
+    },
+    commentSection: {
+      bgcolor: darkMode ? 'rgba(20, 20, 20, 0.7)' : 'rgba(0, 0, 0, 0.03)',
+      color: darkMode ? 'white' : 'text.primary',
+      '& .MuiInputBase-root': {
+        color: darkMode ? 'white' : 'text.primary',
+        '&::placeholder': {
+          color: darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.5)',
+          opacity: 1
+        }
+      },
+      '& .MuiTypography-root': {
+        color: darkMode ? 'white' : 'text.primary'
+      },
+      '& .MuiDivider-root': {
+        bgcolor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'
+      }
+    }
+  };
+
   return (
-    <Card sx={{ 
-      mb: 2, 
-      borderRadius: 2, 
-      boxShadow: '0px 2px 10px rgba(0,0,0,0.5)',
-      bgcolor: 'rgba(30, 30, 30, 0.8)',
-      color: 'white'
-    }}>
+    <Card sx={styles.card}>
       <CardHeader
         avatar={
           <Avatar
@@ -165,7 +240,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
         action={
           user?.id === post.userId && (
             <>
-              <IconButton onClick={openMenu} sx={{ color: 'white' }}>
+              <IconButton onClick={openMenu} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
                 <MoreVertIcon />
               </IconButton>
               <Menu
@@ -174,17 +249,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
                 onClose={closeMenu}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                PaperProps={{
-                  sx: {
-                    bgcolor: 'rgba(30, 30, 30, 0.9)',
-                    color: 'white',
-                    '& .MuiMenuItem-root': {
-                      '&:hover': {
-                        bgcolor: 'rgba(255, 255, 255, 0.1)'
-                      }
-                    }
-                  }
-                }}
+                PaperProps={{ sx: styles.menuPaper }}
               >
                 <MenuItem onClick={handleEdit}>Edit</MenuItem>
                 <MenuItem onClick={handleDelete}>Delete</MenuItem>
@@ -196,36 +261,31 @@ export default function PostCard({ post, onEdit, onDelete }) {
           <Typography
             variant="subtitle1"
             fontWeight="bold"
-            sx={{ cursor: 'pointer', color: 'white' }}
+            sx={{ 
+              cursor: 'pointer', 
+              color: darkMode ? 'white' : 'text.primary'
+            }}
             onClick={goToProfile}
           >
             {post.userName}
           </Typography>
         }
         subheader={
-          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          <Typography variant="caption" sx={styles.subheader}>
             {new Date(post.createdAt).toLocaleString()}
           </Typography>
         }
-        sx={{
-          '& .MuiCardHeader-action': {
-            alignSelf: 'center'
-          }
-        }}
+        sx={styles.cardHeader}
       />
 
-      <CardContent sx={{ pt: 0 }}>
-        <Typography variant="body1" sx={{ 
-          whiteSpace: 'pre-wrap', 
-          mb: 2,
-          color: 'white'
-        }}>
+      <CardContent sx={styles.cardContent}>
+        <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>
           {post.description}
         </Typography>
       </CardContent>
 
       {total > 0 && (
-        <Box sx={{ position: 'relative' }}>
+        <Box sx={styles.mediaContainer}>
           <CardMedia
             component={isVideo ? 'video' : 'img'}
             src={getAvatarUrl(url)}
@@ -234,8 +294,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
             sx={{ 
               width: '100%', 
               height: 'auto', 
-              borderRadius: 1,
-              bgcolor: 'rgba(0,0,0,0.5)'
+              borderRadius: 1
             }}
           />
 
@@ -244,18 +303,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
               {currentIndex > 0 && (
                 <IconButton
                   onClick={goPrev}
-                  sx={{
-                    position: 'absolute',
-                    left: 8,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    bgcolor: 'rgba(0,0,0,0.6)',
-                    color: 'white',
-                    '&:hover': { 
-                      bgcolor: 'rgba(0,0,0,0.8)',
-                      color: 'primary.main'
-                    }
-                  }}
+                  sx={{ ...styles.navButton, left: 8 }}
                 >
                   <ChevronLeftIcon />
                 </IconButton>
@@ -263,18 +311,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
               {currentIndex < total - 1 && (
                 <IconButton
                   onClick={goNext}
-                  sx={{
-                    position: 'absolute',
-                    right: 8,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    bgcolor: 'rgba(0,0,0,0.6)',
-                    color: 'white',
-                    '&:hover': { 
-                      bgcolor: 'rgba(0,0,0,0.8)',
-                      color: 'primary.main'
-                    }
-                  }}
+                  sx={{ ...styles.navButton, right: 8 }}
                 >
                   <ChevronRightIcon />
                 </IconButton>
@@ -284,9 +321,9 @@ export default function PostCard({ post, onEdit, onDelete }) {
         </Box>
       )}
 
-      <CardActions disableSpacing sx={{ bgcolor: 'rgba(0,0,0,0.2)' }}>
+      <CardActions disableSpacing sx={styles.cardActions}>
         <Tooltip title={isLiked ? 'Unlike' : 'Like'}>
-          <IconButton onClick={toggleLike} sx={{ color: 'white' }}>
+          <IconButton onClick={toggleLike} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
             <Badge badgeContent={likesCount} color="primary">
               {isLiked
                 ? <FavoriteIcon color="error" />
@@ -299,7 +336,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
         <Tooltip title="Comments">
           <IconButton 
             onClick={() => setShowComments(s => !s)} 
-            sx={{ color: 'white' }}
+            sx={{ color: darkMode ? 'white' : 'text.primary' }}
           >
             <Badge badgeContent={post.comments?.length || 0} color="primary">
               <ChatBubbleOutlineIcon />
@@ -308,7 +345,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
         </Tooltip>
 
         <Tooltip title="Share">
-          <IconButton onClick={handleShareClick} sx={{ color: 'white' }}>
+          <IconButton onClick={handleShareClick} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
             <ShareIcon />
           </IconButton>
         </Tooltip>
@@ -326,23 +363,13 @@ export default function PostCard({ post, onEdit, onDelete }) {
             vertical: 'top',
             horizontal: 'center',
           }}
-          PaperProps={{
-            sx: {
-              bgcolor: 'rgba(30, 30, 30, 0.95)',
-              color: 'white',
-              boxShadow: '0px 4px 20px rgba(0,0,0,0.5)'
-            }
-          }}
+          PaperProps={{ sx: styles.popoverPaper }}
         >
           <List sx={{ width: 200 }}>
             <ListItem 
               button 
               onClick={() => shareOnPlatform('facebook')}
-              sx={{
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
+              sx={styles.listItem}
             >
               <ListItemIcon>
                 <FacebookIcon color="primary" />
@@ -352,11 +379,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
             <ListItem 
               button 
               onClick={() => shareOnPlatform('twitter')}
-              sx={{
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
+              sx={styles.listItem}
             >
               <ListItemIcon>
                 <TwitterIcon color="primary" />
@@ -366,11 +389,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
             <ListItem 
               button 
               onClick={() => shareOnPlatform('linkedin')}
-              sx={{
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
+              sx={styles.listItem}
             >
               <ListItemIcon>
                 <LinkedInIcon color="primary" />
@@ -380,11 +399,7 @@ export default function PostCard({ post, onEdit, onDelete }) {
             <ListItem 
               button 
               onClick={() => shareOnPlatform('whatsapp')}
-              sx={{
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
+              sx={styles.listItem}
             >
               <ListItemIcon>
                 <WhatsAppIcon color="primary" />
@@ -394,26 +409,18 @@ export default function PostCard({ post, onEdit, onDelete }) {
             <ListItem 
               button 
               onClick={() => shareOnPlatform('email')}
-              sx={{
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
+              sx={styles.listItem}
             >
               <ListItemIcon>
                 <EmailIcon color="primary" />
               </ListItemIcon>
               <ListItemText primary="Email" />
             </ListItem>
-            <Divider sx={{ bgcolor: 'rgba(255, 255, 255, 0.12)' }} />
+            <Divider sx={styles.divider} />
             <ListItem 
               button 
               onClick={copyToClipboard}
-              sx={{
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
+              sx={styles.listItem}
             >
               <ListItemIcon>
                 <LinkIcon color="primary" />
@@ -427,23 +434,8 @@ export default function PostCard({ post, onEdit, onDelete }) {
       {showComments && (
         <CommentSection 
           postId={post.id} 
-          sx={{
-            bgcolor: 'rgba(20, 20, 20, 0.7)',
-            color: 'white',
-            '& .MuiInputBase-root': {
-              color: 'white',
-              '&::placeholder': {
-                color: 'rgba(255, 255, 255, 0.7)',
-                opacity: 1
-              }
-            },
-            '& .MuiTypography-root': {
-              color: 'white'
-            },
-            '& .MuiDivider-root': {
-              bgcolor: 'rgba(255, 255, 255, 0.12)'
-            }
-          }}
+          sx={styles.commentSection}
+          darkMode={darkMode}
         />
       )}
     </Card>

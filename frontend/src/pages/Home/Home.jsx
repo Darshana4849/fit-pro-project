@@ -9,7 +9,11 @@ import {
   Badge,
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
+  List,
+  ListItem,
+  ListItemIcon,
+  Divider
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PostFeed from '../../components/PostFeed/PostFeed';
@@ -17,6 +21,9 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import VideoCameraBackIcon from '@mui/icons-material/VideoCameraBack';
 import CloseIcon from '@mui/icons-material/Close';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 
 export default function Home() {
   const location = useLocation();
@@ -30,12 +37,26 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isNewMedia, setIsNewMedia] = useState(false);
+  const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
     if (token) localStorage.setItem('token', token);
-  }, [location]);
+
+    // Apply dark mode class to body
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [location, darkMode]);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem('darkMode', newDarkMode);
+  };
 
   const handleImageUpload = () => {
     fileInputRef.current.click();
@@ -139,6 +160,17 @@ export default function Home() {
     setError(null);
   };
 
+  const darkModeStyles = {
+    backgroundColor: darkMode ? '#121212' : '#f5f5f5',
+    color: darkMode ? '#ffffff' : '#000000',
+    borderColor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+    paperBg: darkMode ? '#1e1e1e' : '#ffffff',
+    primaryButtonBg: darkMode ? '#1976d2' : '#1976d2',
+    primaryButtonColor: darkMode ? '#ffffff' : '#ffffff',
+    secondaryButtonBg: darkMode ? '#333333' : '#e0e0e0',
+    secondaryButtonColor: darkMode ? '#ffffff' : '#000000',
+  };
+
   return (
     <Box
       component="main"
@@ -149,10 +181,10 @@ export default function Home() {
         px: { xs: 1, sm: 2 },
         py: 2,
         gap: 2,
-        bgcolor: '#000000',
-        color: 'white',
+        bgcolor: darkModeStyles.backgroundColor,
         margin: 0,
-        overflowX: 'hidden'
+        overflowX: 'hidden',
+        transition: 'background-color 0.3s ease'
       }}
     >
       {/* Hidden file inputs */}
@@ -179,8 +211,10 @@ export default function Home() {
         position: 'sticky',
         top: 16,
         height: 'fit-content',
-        bgcolor: '#121212',
-        borderRadius: 2
+        bgcolor: darkModeStyles.paperBg,
+        borderRadius: 2,
+        boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
+        transition: 'background-color 0.3s ease'
       }} />
 
       {/* Main Content Area */}
@@ -200,14 +234,15 @@ export default function Home() {
           sx={{
             p: 2,
             borderRadius: 3,
-            bgcolor: '#121212',
-            boxShadow: '0px 4px 12px rgba(0,0,0,0.5)',
+            bgcolor: darkModeStyles.paperBg,
+            boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
             display: 'flex',
             overflowX: 'auto',
             gap: 2,
             '&::-webkit-scrollbar': {
               display: 'none'
-            }
+            },
+            transition: 'background-color 0.3s ease'
           }}
         >
           {/* Your Story */}
@@ -228,7 +263,7 @@ export default function Home() {
                 <AddCircleOutlineIcon 
                   color="primary" 
                   sx={{ 
-                    bgcolor: '#121212',
+                    bgcolor: darkModeStyles.paperBg,
                     borderRadius: '50%',
                   }} 
                 />
@@ -240,11 +275,11 @@ export default function Home() {
                   height: 60,
                   border: '2px solid',
                   borderColor: 'primary.main',
-                  bgcolor: 'rgba(255,255,255,0.1)'
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
                 }}
               />
             </Badge>
-            <Typography variant="caption" sx={{ mt: 1, color: 'white' }}>
+            <Typography variant="caption" sx={{ mt: 1, color: darkModeStyles.color }}>
               Your Story
             </Typography>
           </Box>
@@ -297,7 +332,7 @@ export default function Home() {
                   />
                 )}
               </Box>
-              <Typography variant="caption" sx={{ mt: 1, color: 'white' }}>
+              <Typography variant="caption" sx={{ mt: 1, color: darkModeStyles.color }}>
                 Your Story
               </Typography>
               <IconButton
@@ -306,10 +341,10 @@ export default function Home() {
                   position: 'absolute',
                   top: 0,
                   right: 0,
-                  bgcolor: 'rgba(0,0,0,0.7)',
-                  color: 'white',
+                  bgcolor: darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)',
+                  color: darkMode ? 'white' : 'black',
                   '&:hover': {
-                    bgcolor: 'rgba(0,0,0,0.9)'
+                    bgcolor: darkMode ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.9)'
                   }
                 }}
                 onClick={(e) => {
@@ -329,14 +364,15 @@ export default function Home() {
           sx={{
             p: 3,
             borderRadius: 3,
-            bgcolor: '#121212',
-            boxShadow: '0px 4px 12px rgba(0,0,0,0.5)',
+            bgcolor: darkModeStyles.paperBg,
+            boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 2
+            gap: 2,
+            transition: 'background-color 0.3s ease'
           }}
         >
-          <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+          <Typography variant="h6" sx={{ color: darkModeStyles.color, fontWeight: 600 }}>
             Create Post
           </Typography>
           
@@ -355,11 +391,11 @@ export default function Home() {
                 textTransform: 'none',
                 fontSize: '1rem',
                 fontWeight: 500,
-                borderColor: 'rgba(255,255,255,0.2)',
-                color: 'white',
+                borderColor: darkModeStyles.borderColor,
+                color: darkModeStyles.color,
                 '&:hover': {
                   borderColor: 'primary.main',
-                  bgcolor: 'rgba(255,255,255,0.05)'
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
                 }
               }}
             >
@@ -370,12 +406,12 @@ export default function Home() {
               onClick={handleImageUpload}
               sx={{
                 border: '1px solid',
-                borderColor: 'rgba(255,255,255,0.2)',
+                borderColor: darkModeStyles.borderColor,
                 borderRadius: 2,
                 p: 1.5,
-                color: 'white',
+                color: darkModeStyles.color,
                 '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.05)',
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
                   borderColor: 'primary.main'
                 }
               }}
@@ -387,12 +423,12 @@ export default function Home() {
               onClick={handleVideoUpload}
               sx={{
                 border: '1px solid',
-                borderColor: 'rgba(255,255,255,0.2)',
+                borderColor: darkModeStyles.borderColor,
                 borderRadius: 2,
                 p: 1.5,
-                color: 'white',
+                color: darkModeStyles.color,
                 '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.05)',
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
                   borderColor: 'primary.main'
                 }
               }}
@@ -412,26 +448,47 @@ export default function Home() {
               width: '6px'
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'rgba(255,255,255,0.3)',
+              backgroundColor: darkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
               borderRadius: '3px'
             }
           }}
         >
-          <PostFeed limit={20} onEdit={null} onDelete={null} />
+          <PostFeed limit={20} onEdit={null} onDelete={null} darkMode={darkMode} />
         </Box>
       </Box>
 
       {/* Right Sidebar */}
       <Box sx={{ 
-        display: { xs: 'none', lg: 'block' },
-        flexBasis: '25%',
-        maxWidth: 300,
-        position: 'sticky',
-        top: 16,
-        height: 'fit-content',
-        bgcolor: '#121212',
-        borderRadius: 2
-      }} />
+  display: { xs: 'none', lg: 'block' },
+  flexBasis: '25%',
+  maxWidth: 80,
+  position: 'sticky',
+  top: 16,
+  height: 'fit-content',
+  bgcolor: darkModeStyles.paperBg,
+  borderRadius: 2,
+  boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
+  transition: 'background-color 0.3s ease',
+  p: 2
+}}>
+        <List>
+                    
+          <ListItem sx={{ p: 0 }}>
+  <IconButton 
+    onClick={toggleDarkMode} 
+    size="small"
+    sx={{
+      color: darkMode ? 'warning.main' : 'text.primary',
+      '&:hover': {
+        bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
+      }
+    }}
+  >
+    {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+  </IconButton>
+</ListItem>
+        </List>
+      </Box>
 
       {/* Media Preview Modal */}
       {showMediaPreview && selectedMedia && (
@@ -456,12 +513,13 @@ export default function Home() {
               position: 'relative',
               maxWidth: '90vw',
               maxHeight: '90vh',
-              bgcolor: '#121212',
+              bgcolor: darkModeStyles.paperBg,
               borderRadius: 2,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '0px 0px 30px rgba(0,0,0,0.8)'
+              boxShadow: '0px 0px 30px rgba(0,0,0,0.8)',
+              transition: 'background-color 0.3s ease'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -578,8 +636,8 @@ export default function Home() {
           severity="error" 
           sx={{ 
             width: '100%',
-            bgcolor: '#1E1E1E',
-            color: 'white',
+            bgcolor: darkMode ? '#1E1E1E' : '#f5f5f5',
+            color: darkMode ? 'white' : 'black',
             border: '1px solid rgba(255,0,0,0.3)',
             '& .MuiAlert-icon': {
               color: 'error.main'
