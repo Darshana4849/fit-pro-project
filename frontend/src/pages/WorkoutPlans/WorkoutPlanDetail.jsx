@@ -107,15 +107,16 @@ const WorkoutPlanDetail = () => {
             </svg>
             Edit
           </Link>
-          <button 
-            onClick={() => window.location.href = '/workout-progress'}
+          
+          <Link
+            to={`/workout-plans/${id}/execute`}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
             </svg>
             Start This Plan
-          </button>
+          </Link>
         </div>
       </div>
 
