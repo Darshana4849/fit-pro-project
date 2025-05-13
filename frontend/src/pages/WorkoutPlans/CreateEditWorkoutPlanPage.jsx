@@ -25,6 +25,13 @@ const CreateEditWorkoutPlan = () => {
     reps: '8-12',
     duration: '',
   });
+  const [editingExerciseIndex, setEditingExerciseIndex] = useState(null);
+  const [editingExercise, setEditingExercise] = useState({
+    name: '',
+    sets: 3,
+    reps: '8-12',
+    duration: '',
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
@@ -88,15 +95,11 @@ const CreateEditWorkoutPlan = () => {
     });
   };
 
-  const handleExerciseChange = (index, field, value) => {
-    const updatedExercises = [...formData.exercises];
-    updatedExercises[index] = {
-      ...updatedExercises[index],
-      [field]: field === 'sets' ? parseInt(value) : value,
-    };
-    setFormData({
-      ...formData,
-      exercises: updatedExercises,
+  const handleEditingExerciseInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditingExercise({
+      ...editingExercise,
+      [name]: value,
     });
   };
 
@@ -138,6 +141,42 @@ const CreateEditWorkoutPlan = () => {
     setFormData({
       ...formData,
       exercises: updatedExercises,
+    });
+    if (editingExerciseIndex === index) {
+      setEditingExerciseIndex(null);
+    }
+  };
+
+  const startEditingExercise = (index) => {
+    setEditingExerciseIndex(index);
+    setEditingExercise({ ...formData.exercises[index] });
+  };
+
+  const saveEditedExercise = () => {
+    if (editingExercise.name.trim()) {
+      const updatedExercises = [...formData.exercises];
+      updatedExercises[editingExerciseIndex] = { ...editingExercise };
+      setFormData({
+        ...formData,
+        exercises: updatedExercises,
+      });
+      setEditingExerciseIndex(null);
+      setEditingExercise({
+        name: '',
+        sets: 3,
+        reps: '8-12',
+        duration: '',
+      });
+    }
+  };
+
+  const cancelEditingExercise = () => {
+    setEditingExerciseIndex(null);
+    setEditingExercise({
+      name: '',
+      sets: 3,
+      reps: '8-12',
+      duration: '',
     });
   };
 
@@ -279,25 +318,6 @@ const CreateEditWorkoutPlan = () => {
                     placeholder="e.g., 30 minutes"
                   />
                 </div>
-
-                {/* <div className="flex items-center justify-start pt-6">
-                  <div className="flex items-center h-5">
-                    <input
-                      type="checkbox"
-                      name="isPublic"
-                      id="isPublic"
-                      checked={formData.isPublic}
-                      onChange={handleInputChange}
-                      className={`h-5 w-5 rounded focus:ring-purple-500 ${darkMode ? 'bg-gray-700 border-gray-600 text-purple-500' : 'text-purple-600 border-gray-300'}`}
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="isPublic" className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Make this plan public
-                    </label>
-                    <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Others can view and use this plan</p>
-                  </div>
-                </div> */}
               </div>
 
               <div className="mb-6">
@@ -384,37 +404,130 @@ const CreateEditWorkoutPlan = () => {
               <div className="space-y-4">
                 {formData.exercises.map((exercise, index) => (
                   <div key={index} className={`${darkMode ? 'bg-gray-750 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg p-5 shadow-sm hover:shadow-md transition duration-200`}>
-                    <div className="flex justify-between items-center mb-3">
-                      <div className="flex items-center">
-                        <div className={`${darkMode ? 'bg-purple-900 text-purple-300' : 'bg-purple-100 text-purple-800'} font-semibold rounded-full w-8 h-8 flex items-center justify-center mr-3`}>
-                          {index + 1}
+                    {editingExerciseIndex === index ? (
+                      <div>
+                        <h3 className={`font-medium text-lg ${darkMode ? 'text-gray-200' : 'text-gray-800'} mb-4 flex items-center`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.379-8.379-2.828-2.828z" />
+                          </svg>
+                          Edit Exercise
+                        </h3>
+                        <div className="mb-4">
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Exercise Name*</label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={editingExercise.name}
+                            onChange={handleEditingExerciseInputChange}
+                            className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
+                            placeholder="e.g., Squats, Push-ups, Planks"
+                          />
                         </div>
-                        <h3 className={`font-medium text-lg ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{exercise.name}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                          <div>
+                            <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Sets</label>
+                            <input
+                              type="number"
+                              name="sets"
+                              value={editingExercise.sets}
+                              onChange={handleEditingExerciseInputChange}
+                              min="1"
+                              className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                            />
+                          </div>
+                          <div>
+                            <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Reps or Duration</label>
+                            <div className="flex space-x-2">
+                              <div className="w-full">
+                                <input
+                                  type="text"
+                                  name="reps"
+                                  value={editingExercise.reps}
+                                  onChange={handleEditingExerciseInputChange}
+                                  className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
+                                  placeholder="8-12"
+                                />
+                                <p className={`mt-1 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>For counted exercises</p>
+                              </div>
+                              <span className={`self-center mx-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>OR</span>
+                              <div className="w-full">
+                                <input
+                                  type="text"
+                                  name="duration"
+                                  value={editingExercise.duration}
+                                  onChange={handleEditingExerciseInputChange}
+                                  className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
+                                  placeholder="30 sec"
+                                />
+                                <p className={`mt-1 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>For timed exercises</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex space-x-3">
+                          <button
+                            type="button"
+                            onClick={saveEditedExercise}
+                            disabled={!editingExercise.name.trim()}
+                            className={`flex-1 py-3 px-4 rounded-lg border transition duration-200 ${darkMode ? 'bg-purple-900 border-purple-700 text-purple-300 hover:bg-purple-800' : 'bg-purple-100 border-purple-300 text-purple-800 hover:bg-purple-200'} disabled:opacity-50`}
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEditingExercise}
+                            className={`flex-1 py-3 px-4 rounded-lg border transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeExercise(index)}
-                        className={`${darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'} flex items-center transition duration-200`}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                        Remove
-                      </button>
-                    </div>
-                    
-                    <div className={`grid grid-cols-2 gap-4 mt-4 text-sm ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'} p-3 rounded-lg`}>
+                    ) : (
                       <div>
-                        <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Sets:</span>
-                        <span className="ml-2 font-medium">{exercise.sets}</span>
+                        <div className="flex justify-between items-center mb-3">
+                          <div className="flex items-center">
+                            <div className={`${darkMode ? 'bg-purple-900 text-purple-300' : 'bg-purple-100 text-purple-800'} font-semibold rounded-full w-8 h-8 flex items-center justify-center mr-3`}>
+                              {index + 1}
+                            </div>
+                            <h3 className={`font-medium text-lg ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{exercise.name}</h3>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              type="button"
+                              onClick={() => startEditingExercise(index)}
+                              className={`${darkMode ? 'text-purple-400 hover:text-purple-300' : 'text-purple-500 hover:text-purple-700'} flex items-center transition duration-200`}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.379-8.379-2.828-2.828z" />
+                              </svg>
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeExercise(index)}
+                              className={`${darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'} flex items-center transition duration-200`}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                        <div className={`grid grid-cols-2 gap-4 mt-4 text-sm ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'} p-3 rounded-lg`}>
+                          <div>
+                            <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Sets:</span>
+                            <span className="ml-2 font-medium">{exercise.sets}</span>
+                          </div>
+                          <div>
+                            <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+                              {exercise.duration ? 'Duration:' : 'Reps:'}
+                            </span>
+                            <span className="ml-2 font-medium">{exercise.duration || exercise.reps}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
-                          {exercise.duration ? 'Duration:' : 'Reps:'}
-                        </span>
-                        <span className="ml-2 font-medium">{exercise.duration || exercise.reps}</span>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
