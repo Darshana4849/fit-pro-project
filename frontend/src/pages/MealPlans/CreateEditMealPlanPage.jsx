@@ -223,7 +223,7 @@ const CreateEditMealPlan = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-start pt-6">
+              {/* <div className="flex items-center justify-start pt-6">
                 <div className="flex items-center h-5">
                   <input
                     type="checkbox"
@@ -240,7 +240,7 @@ const CreateEditMealPlan = () => {
                   </label>
                   <p className="text-gray-400">Others can view and use this plan</p>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-4">

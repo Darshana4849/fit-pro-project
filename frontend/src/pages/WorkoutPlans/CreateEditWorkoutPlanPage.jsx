@@ -280,7 +280,7 @@ const CreateEditWorkoutPlan = () => {
                   />
                 </div>
 
-                <div className="flex items-center justify-start pt-6">
+                {/* <div className="flex items-center justify-start pt-6">
                   <div className="flex items-center h-5">
                     <input
                       type="checkbox"
@@ -297,7 +297,7 @@ const CreateEditWorkoutPlan = () => {
                     </label>
                     <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Others can view and use this plan</p>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <div className="mb-6">
