@@ -36,6 +36,14 @@ const CreateEditWorkoutPlan = () => {
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
 
+  // Validation function for letters and spaces only
+  const allowOnlyLetters = (e) => {
+    const regex = /^[A-Za-z\s]*$/;
+    if (!regex.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
   // Initialize dark mode from local storage or system preference
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -104,10 +112,11 @@ const CreateEditWorkoutPlan = () => {
   };
 
   const addTargetMuscle = () => {
-    if (newTargetMuscle.trim() && !formData.targetMuscles.includes(newTargetMuscle)) {
+    const trimmedMuscle = newTargetMuscle.trim();
+    if (trimmedMuscle && !formData.targetMuscles.includes(trimmedMuscle) && /^[A-Za-z\s]+$/.test(trimmedMuscle)) {
       setFormData({
         ...formData,
-        targetMuscles: [...formData.targetMuscles, newTargetMuscle.trim()],
+        targetMuscles: [...formData.targetMuscles, trimmedMuscle],
       });
       setNewTargetMuscle('');
     }
@@ -121,7 +130,7 @@ const CreateEditWorkoutPlan = () => {
   };
 
   const addExercise = () => {
-    if (newExercise.name.trim()) {
+    if (newExercise.name.trim() && /^[A-Za-z\s]+$/.test(newExercise.name.trim())) {
       setFormData({
         ...formData,
         exercises: [...formData.exercises, { ...newExercise }],
@@ -153,7 +162,7 @@ const CreateEditWorkoutPlan = () => {
   };
 
   const saveEditedExercise = () => {
-    if (editingExercise.name.trim()) {
+    if (editingExercise.name.trim() && /^[A-Za-z\s]+$/.test(editingExercise.name.trim())) {
       const updatedExercises = [...formData.exercises];
       updatedExercises[editingExerciseIndex] = { ...editingExercise };
       setFormData({
@@ -182,6 +191,10 @@ const CreateEditWorkoutPlan = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!/^[A-Za-z\s]+$/.test(formData.title.trim())) {
+      setError('Plan Title must contain only letters and spaces.');
+      return;
+    }
     try {
       setLoading(true);
       if (id) {
@@ -280,6 +293,7 @@ const CreateEditWorkoutPlan = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
+                  onKeyPress={allowOnlyLetters}
                   required
                   className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
                   placeholder="e.g., Beginner Full Body Workout"
@@ -352,9 +366,12 @@ const CreateEditWorkoutPlan = () => {
                   type="text"
                   value={newTargetMuscle}
                   onChange={(e) => setNewTargetMuscle(e.target.value)}
+                  onKeyPress={(e) => {
+                    allowOnlyLetters(e);
+                    if (e.key === 'Enter') addTargetMuscle();
+                  }}
                   placeholder="Add target muscle (e.g. Chest, Back)"
                   className={`flex-1 px-4 py-3 rounded-l-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
-                  onKeyPress={(e) => e.key === 'Enter' && addTargetMuscle()}
                 />
                 <button
                   type="button"
@@ -376,7 +393,7 @@ const CreateEditWorkoutPlan = () => {
                     {muscle}
                     <button
                       type="button"
-                      onClick={() => removeTargetMuscle(muscle)}
+                      onClick={() => removeTargetMuscle(mcule)}
                       className={`ml-2 ${darkMode ? 'text-green-400 hover:text-green-200' : 'text-green-600 hover:text-green-900'}`}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -419,6 +436,7 @@ const CreateEditWorkoutPlan = () => {
                             name="name"
                             value={editingExercise.name}
                             onChange={handleEditingExerciseInputChange}
+                            onKeyPress={allowOnlyLetters}
                             className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
                             placeholder="e.g., Squats, Push-ups, Planks"
                           />
@@ -556,6 +574,7 @@ const CreateEditWorkoutPlan = () => {
                   name="name"
                   value={newExercise.name}
                   onChange={handleExerciseInputChange}
+                  onKeyPress={allowOnlyLetters}
                   className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'}`}
                   placeholder="e.g., Squats, Push-ups, Planks"
                 />
