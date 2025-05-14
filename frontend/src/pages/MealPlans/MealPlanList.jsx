@@ -161,7 +161,7 @@ const MealPlanList = () => {
                 </span>
               )}
             </button>
-            <button
+            {/* <button
               onClick={() => setShowPublic(!showPublic)}
               className={`px-4 py-2 rounded-md border ${
                 darkMode 
@@ -170,7 +170,7 @@ const MealPlanList = () => {
               } transition-colors`}
             >
               {showPublic ? 'Show My Plans' : 'Show Public Plans'}
-            </button>
+            </button> */}
             <Link
               to="/meal-plans-form"
               className={`px-4 py-2 ${

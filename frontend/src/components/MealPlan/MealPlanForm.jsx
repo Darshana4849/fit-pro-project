@@ -46,6 +46,51 @@ const MealPlanForm = () => {
     }
   }, [id]);
 
+  // Input validation handlers
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    // Allow only letters and numbers
+    if (/^[a-zA-Z0-9\s]*$/.test(value) || value === '') {
+      setFormData({
+        ...formData,
+        title: value,
+      });
+    }
+  };
+
+  const handleDurationChange = (e) => {
+    const value = e.target.value;
+    // Allow only numbers
+    if (/^\d*$/.test(value) || value === '') {
+      setFormData({
+        ...formData,
+        durationDays: value === '' ? '' : parseInt(value, 10),
+      });
+    }
+  };
+
+  const handleMealNameChange = (e) => {
+    const value = e.target.value;
+    // Allow only letters
+    if (/^[a-zA-Z\s]*$/.test(value) || value === '') {
+      setNewMeal({
+        ...newMeal,
+        name: value,
+      });
+    }
+  };
+
+  const handleIngredientNameChange = (e) => {
+    const value = e.target.value;
+    // Allow only letters
+    if (/^[a-zA-Z\s]*$/.test(value) || value === '') {
+      setNewIngredient({
+        ...newIngredient,
+        name: value,
+      });
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -56,6 +101,12 @@ const MealPlanForm = () => {
 
   const handleMealInputChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === 'name') {
+      // Meal name is handled separately
+      return;
+    }
+
     setNewMeal({
       ...newMeal,
       [name]: name === 'calories' ? parseInt(value) : value,
@@ -64,6 +115,12 @@ const MealPlanForm = () => {
 
   const handleIngredientInputChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === 'name') {
+      // Ingredient name is handled separately
+      return;
+    }
+
     setNewIngredient({
       ...newIngredient,
       [name]: value,
@@ -182,7 +239,7 @@ const MealPlanForm = () => {
                   type="text"
                   name="title"
                   value={formData.title}
-                  onChange={handleInputChange}
+                  onChange={handleTitleChange}
                   required
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 />
@@ -209,17 +266,17 @@ const MealPlanForm = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Duration (days)*</label>
                 <input
-                  type="number"
+                  type="text"
                   name="durationDays"
                   value={formData.durationDays}
-                  onChange={handleInputChange}
+                  onChange={handleDurationChange}
                   min="1"
                   required
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 />
               </div>
 
-              <div className="flex items-center justify-start pt-6">
+              {/* <div className="flex items-center justify-start pt-6">
                 <div className="flex items-center h-5">
                   <input
                     type="checkbox"
@@ -236,7 +293,7 @@ const MealPlanForm = () => {
                   </label>
                   <p className="text-gray-400">Others can view and use this plan</p>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-4">
@@ -266,7 +323,7 @@ const MealPlanForm = () => {
                     type="text"
                     name="name"
                     value={newMeal.name}
-                    onChange={handleMealInputChange}
+                    onChange={handleMealNameChange}
                     className="w-full px-3 py-2 bg-gray-900 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                     placeholder="Meal name"
                   />
@@ -321,7 +378,7 @@ const MealPlanForm = () => {
                       type="text"
                       name="name"
                       value={newIngredient.name}
-                      onChange={handleIngredientInputChange}
+                      onChange={handleIngredientNameChange}
                       className="w-full px-3 py-2 bg-gray-900 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                       placeholder="Ingredient name"
                     />

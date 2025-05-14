@@ -32,6 +32,8 @@ const CreateEditMealPlan = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [editingMealIndex, setEditingMealIndex] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -99,10 +101,25 @@ const CreateEditMealPlan = () => {
 
   const addMeal = () => {
     if (newMeal.name.trim() && newMeal.ingredients.length > 0) {
-      setFormData({
-        ...formData,
-        meals: [...formData.meals, { ...newMeal }],
-      });
+      if (isEditing && editingMealIndex !== null) {
+        // Update existing meal
+        const updatedMeals = [...formData.meals];
+        updatedMeals[editingMealIndex] = { ...newMeal };
+        setFormData({
+          ...formData,
+          meals: updatedMeals,
+        });
+        setIsEditing(false);
+        setEditingMealIndex(null);
+      } else {
+        // Add new meal
+        setFormData({
+          ...formData,
+          meals: [...formData.meals, { ...newMeal }],
+        });
+      }
+      
+      // Reset form
       setNewMeal({
         name: '',
         description: '',
@@ -114,6 +131,27 @@ const CreateEditMealPlan = () => {
     }
   };
 
+  const startEditingMeal = (index) => {
+    setNewMeal({...formData.meals[index]});
+    setEditingMealIndex(index);
+    setIsEditing(true);
+    // Scroll to the meal form
+    document.querySelector('#meal-form').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const cancelEditingMeal = () => {
+    setNewMeal({
+      name: '',
+      description: '',
+      timeOfDay: 'Breakfast',
+      ingredients: [],
+      preparation: '',
+      calories: 500,
+    });
+    setIsEditing(false);
+    setEditingMealIndex(null);
+  };
+
   const removeMeal = (index) => {
     const updatedMeals = [...formData.meals];
     updatedMeals.splice(index, 1);
@@ -121,6 +159,14 @@ const CreateEditMealPlan = () => {
       ...formData,
       meals: updatedMeals,
     });
+    
+    // If we're currently editing this meal, cancel editing
+    if (editingMealIndex === index) {
+      cancelEditingMeal();
+    } else if (editingMealIndex > index) {
+      // If we're editing a meal that comes after the removed meal, adjust the index
+      setEditingMealIndex(editingMealIndex - 1);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -223,7 +269,7 @@ const CreateEditMealPlan = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-start pt-6">
+              {/* <div className="flex items-center justify-start pt-6">
                 <div className="flex items-center h-5">
                   <input
                     type="checkbox"
@@ -240,7 +286,7 @@ const CreateEditMealPlan = () => {
                   </label>
                   <p className="text-gray-400">Others can view and use this plan</p>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-4">
@@ -260,9 +306,11 @@ const CreateEditMealPlan = () => {
           <div className="bg-gray-700 p-6 rounded-lg">
             <h2 className="text-xl font-semibold text-purple-300 mb-6">Meals</h2>
             
-            {/* Add Meal Form */}
-            <div className="bg-gray-800 p-4 rounded-lg shadow-md mb-6">
-              <h3 className="font-medium text-purple-300 mb-4">Add New Meal</h3>
+            {/* Add/Edit Meal Form */}
+            <div id="meal-form" className="bg-gray-800 p-4 rounded-lg shadow-md mb-6">
+              <h3 className="font-medium text-purple-300 mb-4">
+                {isEditing ? 'Edit Meal' : 'Add New Meal'}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Name*</label>
@@ -401,17 +449,42 @@ const CreateEditMealPlan = () => {
                 />
               </div>
 
-              <button
-                type="button"
-                onClick={addMeal}
-                disabled={!newMeal.name.trim() || newMeal.ingredients.length === 0}
-                className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-600 disabled:text-gray-400 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                </svg>
-                Add Meal
-              </button>
+              <div className="flex space-x-3">
+                {isEditing && (
+                  <button
+                    type="button"
+                    onClick={cancelEditingMeal}
+                    className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                    Cancel
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={addMeal}
+                  disabled={!newMeal.name.trim() || newMeal.ingredients.length === 0}
+                  className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-600 disabled:text-gray-400 transition-colors"
+                >
+                  {isEditing ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Save Changes
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
+                      Add Meal
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Meals List */}
@@ -424,15 +497,28 @@ const CreateEditMealPlan = () => {
                         <h3 className="font-medium text-lg text-gray-200">{meal.name}</h3>
                         <p className="text-sm text-purple-300">{meal.timeOfDay}</p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeMeal(index)}
-                        className="text-red-400 hover:text-red-300"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                      </button>
+                      <div className="flex space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => startEditingMeal(index)}
+                          className="text-blue-400 hover:text-blue-300"
+                          title="Edit meal"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeMeal(index)}
+                          className="text-red-400 hover:text-red-300"
+                          title="Remove meal"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                     
                     {meal.description && (
@@ -462,6 +548,11 @@ const CreateEditMealPlan = () => {
                       <span className="text-sm font-medium text-gray-300">
                         {meal.calories} calories
                       </span>
+                      {editingMealIndex === index && (
+                        <span className="text-xs bg-purple-900 text-purple-200 px-2 py-1 rounded">
+                          Currently Editing
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))

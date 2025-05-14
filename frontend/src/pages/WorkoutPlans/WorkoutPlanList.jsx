@@ -120,7 +120,7 @@ const WorkoutPlanList = () => {
                 </span>
               )}
             </button>
-            <button
+            {/* <button
               onClick={() => setShowPublic(!showPublic)}
               className={`px-4 py-2 rounded-md border ${
                 darkMode 
@@ -129,7 +129,7 @@ const WorkoutPlanList = () => {
               } transition-colors`}
             >
               {showPublic ? 'Show My Plans' : 'Show Public Plans'}
-            </button>
+            </button> */}
             <Link
               to="/workout-plans-form"
               className={`px-4 py-2 ${
