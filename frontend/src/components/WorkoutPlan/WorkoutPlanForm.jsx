@@ -19,6 +19,37 @@ const WorkoutPlanForm = () => {
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
 
+  // Validation functions
+  const allowOnlyLetters = (e) => {
+    const regex = /^[A-Za-z\s]*$/;
+    if (!regex.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  const allowOnlyNumbers = (e) => {
+    const regex = /^[0-9]*$/;
+    if (!regex.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  const allowNumbersAndHyphen = (e) => {
+    const regex = /^[0-9-]*$/;
+    if (!regex.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  // Handle key press for target muscle input
+  const handleTargetMuscleKeyPress = (e) => {
+    allowOnlyLetters(e);
+    if (e.key === 'Enter') {
+      addTargetMuscle();
+      e.preventDefault();
+    }
+  };
+
   // Initialize dark mode from local storage or system preference
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -30,7 +61,6 @@ const WorkoutPlanForm = () => {
       localStorage.setItem('darkMode', prefersDark);
     }
     
-    // Apply dark mode class to body
     if (darkMode) {
       document.body.classList.add('dark-mode');
     } else {
@@ -83,7 +113,8 @@ const WorkoutPlanForm = () => {
   };
 
   const addTargetMuscle = () => {
-    if (newTargetMuscle.trim() && !formData.targetMuscles.includes(newTargetMuscle)) {
+    const regex = /^[A-Za-z\s]+$/;
+    if (newTargetMuscle.trim() && regex.test(newTargetMuscle) && !formData.targetMuscles.includes(newTargetMuscle)) {
       setFormData({
         ...formData,
         targetMuscles: [...formData.targetMuscles, newTargetMuscle.trim()],
@@ -114,7 +145,7 @@ const WorkoutPlanForm = () => {
     });
   };
 
-  const removeExercise = (index) => {
+  const removeExercise = (indexั้น) => {
     const updatedExercises = [...formData.exercises];
     updatedExercises.splice(index, 1);
     setFormData({
@@ -204,6 +235,7 @@ const WorkoutPlanForm = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
+                  onKeyPress={allowOnlyLetters}
                   required
                   className={`w-full px-4 py-2 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100 focus:ring-blue-500 focus:border-blue-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'} rounded-lg transition-all`}
                 />
@@ -236,25 +268,6 @@ const WorkoutPlanForm = () => {
                   className={`w-full px-4 py-2 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100 focus:ring-blue-500 focus:border-blue-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'} rounded-lg transition-all`}
                 />
               </div>
-
-              {/* <div className="flex items-center justify-start pt-6">
-                <div className="flex items-center h-5">
-                  <input
-                    type="checkbox"
-                    name="isPublic"
-                    id="isPublic"
-                    checked={formData.isPublic}
-                    onChange={handleInputChange}
-                    className={`h-5 w-5 ${darkMode ? 'bg-gray-700 border-gray-600 text-blue-500' : 'text-blue-600 border-gray-300'} rounded focus:ring-blue-500`}
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="isPublic" className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Make this plan public
-                  </label>
-                  <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Others can view and use this plan</p>
-                </div>
-              </div> */}
             </div>
 
             <div className="mt-4">
@@ -278,9 +291,9 @@ const WorkoutPlanForm = () => {
                 type="text"
                 value={newTargetMuscle}
                 onChange={(e) => setNewTargetMuscle(e.target.value)}
+                onKeyPress={handleTargetMuscleKeyPress}
                 placeholder="Add target muscle (e.g. Chest, Back)"
                 className={`flex-1 px-4 py-2 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100 focus:ring-green-500 focus:border-green-500' : 'border-gray-300 focus:ring-green-500 focus:border-green-500'} rounded-l-lg transition-all`}
-                onKeyPress={(e) => e.key === 'Enter' && addTargetMuscle()}
               />
               <button
                 type="button"
@@ -317,7 +330,6 @@ const WorkoutPlanForm = () => {
           <div className={`${darkMode ? 'bg-purple-900/20' : 'bg-purple-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-purple-300' : 'text-purple-800'} mb-6`}>Exercises</h2>
             
-            {/* Exercises List */}
             <div className="space-y-8">
               {formData.exercises.length > 0 ? (
                 formData.exercises.map((exercise, index) => (
@@ -332,7 +344,7 @@ const WorkoutPlanForm = () => {
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
+                    </svg>
                     </button>
                     
                     <h3 className={`font-semibold text-lg mb-4 ${darkMode ? 'text-gray-200' : ''}`}>Exercise {index + 1}</h3>
@@ -344,6 +356,7 @@ const WorkoutPlanForm = () => {
                           type="text"
                           value={exercise.name}
                           onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
+                          onKeyPress={allowOnlyLetters}
                           required
                           placeholder="e.g., Squats"
                           className={`w-full px-4 py-2 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 focus:border-purple-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'} rounded-lg transition-all`}
@@ -361,11 +374,6 @@ const WorkoutPlanForm = () => {
                               min="1"
                               className={`w-full px-4 py-2 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 focus:border-purple-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'} rounded-lg transition-all`}
                             />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                              <svg className={`h-5 w-5 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                
-                              </svg>
-                            </div>
                           </div>
                         </div>
                         
@@ -375,6 +383,7 @@ const WorkoutPlanForm = () => {
                             type="text"
                             value={exercise.reps}
                             onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
+                            onKeyPress={allowNumbersAndHyphen}
                             placeholder="8-12"
                             className={`w-full px-4 py-2 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100 focus:ring-purple-500 focus:border-purple-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'} rounded-lg transition-all`}
                           />
@@ -403,7 +412,6 @@ const WorkoutPlanForm = () => {
                 </div>
               )}
               
-              {/* Add Another Exercise Button */}
               <button
                 type="button"
                 onClick={addExercise}
@@ -421,7 +429,6 @@ const WorkoutPlanForm = () => {
             </div>
           </div>
 
-          {/* Form Actions */}
           <div className={`flex justify-end space-x-4 pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <button
               type="button"
@@ -459,7 +466,6 @@ const darkModeStyles = `
   }
 `;
 
-// You can include this style tag directly in your component or add it to your global CSS
 const styleEl = document.createElement('style');
 styleEl.textContent = darkModeStyles;
 document.head.appendChild(styleEl);
