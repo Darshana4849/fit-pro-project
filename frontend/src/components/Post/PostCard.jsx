@@ -431,6 +431,7 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
         </Popover>
       </CardActions>
 
+
       {showComments && (
         <CommentSection 
           postId={post.id} 
