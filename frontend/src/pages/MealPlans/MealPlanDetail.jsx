@@ -7,8 +7,7 @@ import { getMealPlanById } from '../../services/mealPlanService';
 const MealPlanDetail = () => {
   const { id } = useParams();
   const [mealPlan, setMealPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     const fetchMealPlan = async () => {
