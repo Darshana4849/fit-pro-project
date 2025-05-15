@@ -90,7 +90,7 @@ const CreateEditMealPlan = () => {
       });
     }
   };
-
+//update remove ingredient
   const removeIngredient = (index) => {
     const updatedIngredients = [...newMeal.ingredients];
     updatedIngredients.splice(index, 1);
