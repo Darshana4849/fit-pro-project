@@ -17,18 +17,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * REST controller for handling post-related operations including creation,
+ * retrieval, update, and deletion of posts.
+ * Supports cross-origin requests from the frontend development server.
+ */
 @RestController
 @RequestMapping("/posts")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class PostController {
 
     @Autowired
-    private PostRepository postRepository;
+    private PostRepository postRepository; // Repository for post data operations
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository; // Repository for user data operations
 
-    // --- Helper to extract the current user's email from the security context ---
+    /**
+     * Helper method to extract the current user's email from the security context.
+     * Supports multiple authentication types: JWT, OAuth2, and UserDetails.
+     * 
+     * @return String representing the logged-in user's email or principal name
+     */
     private String getLoggedInUserEmail() {
         Object principal = SecurityContextHolder.getContext()
                                                 .getAuthentication()
@@ -47,15 +57,21 @@ public class PostController {
         }
     }
 
-    // --- Helper to load the current User entity ---
+    /**
+     * Helper method to load the current User entity from the database.
+     * 
+     * @return Optional containing the current User if found, empty otherwise
+     */
     private Optional<User> getCurrentUser() {
         String email = getLoggedInUserEmail();
         return userRepository.findByEmail(email);
     }
 
     /**
-     * POST /posts
      * Create a new post by the logged-in user.
+     * 
+     * @param post The post data to be created
+     * @return ResponseEntity with the created post or unauthorized status
      */
     @PostMapping
     public ResponseEntity<?> createPost(@RequestBody Post post) {
@@ -76,8 +92,10 @@ public class PostController {
     }
 
     /**
-     * GET /posts
-     * Return a feed: all posts by the current user and those they follow, newest first.
+     * Get a feed of posts including the current user's posts and those of users they follow.
+     * Posts are ordered by creation date (newest first).
+     * 
+     * @return ResponseEntity with the feed posts or unauthorized status
      */
     @GetMapping
     public ResponseEntity<?> getFeed() {
@@ -96,8 +114,10 @@ public class PostController {
     }
 
     /**
-     * GET /posts/user/{userId}
-     * Return all posts by a given user (for profile pages), newest first.
+     * Get all posts by a specific user (for profile pages), ordered by creation date (newest first).
+     * 
+     * @param userId The ID of the user whose posts to retrieve
+     * @return ResponseEntity with the user's posts
      */
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getPostsByUser(@PathVariable String userId) {
@@ -106,8 +126,10 @@ public class PostController {
     }
 
     /**
-     * GET /posts/{id}
-     * Return a single post by its ID.
+     * Get a single post by its ID.
+     * 
+     * @param id The ID of the post to retrieve
+     * @return ResponseEntity with the post if found, or not found status
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(@PathVariable String id) {
@@ -117,8 +139,11 @@ public class PostController {
     }
 
     /**
-     * PUT /posts/{id}
-     * Update a post’s description and mediaUrls. Only the owner may update.
+     * Update a post's description and media URLs. Only the post owner can update.
+     * 
+     * @param id The ID of the post to update
+     * @param updates The post data containing the updates
+     * @return ResponseEntity with the updated post, or appropriate error status
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePost(
@@ -149,8 +174,10 @@ public class PostController {
     }
 
     /**
-     * DELETE /posts/{id}
-     * Delete a post. Only the owner may delete.
+     * Delete a post. Only the post owner can delete.
+     * 
+     * @param id The ID of the post to delete
+     * @return ResponseEntity with no content if successful, or appropriate error status
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePost(@PathVariable String id) {
