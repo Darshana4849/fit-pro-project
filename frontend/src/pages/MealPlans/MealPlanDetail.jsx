@@ -7,6 +7,8 @@ import { getMealPlanById } from '../../services/mealPlanService';
 const MealPlanDetail = () => {
   // Get the meal plan ID from URL parameters
   const { id } = useParams();
+
+  // State management for meal plan data, loading status, and errors
   const [mealPlan, setMealPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
