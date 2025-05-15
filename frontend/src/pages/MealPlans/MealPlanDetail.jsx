@@ -5,6 +5,7 @@ import { getMealPlanById } from '../../services/mealPlanService';
 
 // MealPlanDetail component displays detailed information about a specific meal plan
 const MealPlanDetail = () => {
+  // Get the meal plan ID from URL parameters
   const { id } = useParams();
   const [mealPlan, setMealPlan] = useState(null);
   const [loading, setLoading] = useState(true);
