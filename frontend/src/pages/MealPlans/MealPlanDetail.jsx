@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getMealPlanById } from '../../services/mealPlanService';
 
 
+// MealPlanDetail component displays detailed information about a specific meal plan
 const MealPlanDetail = () => {
   const { id } = useParams();
   const [mealPlan, setMealPlan] = useState(null);
