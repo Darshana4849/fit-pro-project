@@ -19,7 +19,7 @@ const MealPlanDetail = () => {
       try {
         setLoading(true);
         // Call service to get meal plan by ID
-        const plan = await getMealPlanById(id);
+        
         setMealPlan(plan);
       } catch (err) {
         setError(err.message);
