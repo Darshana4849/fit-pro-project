@@ -13,6 +13,7 @@ const MealPlanDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch meal plan data when component mounts or ID changes
   useEffect(() => {
     const fetchMealPlan = async () => {
       try {
