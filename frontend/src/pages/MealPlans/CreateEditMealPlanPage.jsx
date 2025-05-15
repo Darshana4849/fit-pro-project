@@ -51,6 +51,7 @@ const CreateEditMealPlan = () => {
       fetchMealPlan();
     }
   }, [id]);
+  //const handelinputchange added
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
