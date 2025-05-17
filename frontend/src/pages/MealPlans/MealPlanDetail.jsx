@@ -51,6 +51,7 @@ const MealPlanDetail = () => {
     </div>
   );
 
+  // Main render when data is successfully loaded
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-start mb-6">
