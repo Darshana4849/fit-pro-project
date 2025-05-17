@@ -108,7 +108,7 @@ const WorkoutPlanForm = () => {
     };
     setFormData({
       ...formData,
-      exercises: updatedExercises,
+      exercises: updatedExercises, //update workouut plan exercises
     });
   };
 
