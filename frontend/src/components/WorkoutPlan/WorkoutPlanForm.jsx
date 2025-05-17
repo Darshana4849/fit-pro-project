@@ -170,7 +170,7 @@ const WorkoutPlanForm = () => {
       setLoading(false);
     }
   };
-
+//justify items
   if (loading) return (
     <div className={`flex justify-center items-center min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${darkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
