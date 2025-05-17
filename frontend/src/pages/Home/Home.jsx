@@ -25,11 +25,20 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 
+/**
+ * Home component - Main page of the application with stories, posts, and media upload functionality
+ * @returns {JSX.Element} The home page component
+ */
 export default function Home() {
+  // Router hooks
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Refs for file inputs
   const fileInputRef = useRef(null);
   const videoInputRef = useRef(null);
+  
+  // State management
   const [stories, setStories] = useState([]);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
@@ -38,9 +47,13 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [isNewMedia, setIsNewMedia] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
+  
+  // Ref for story cleanup interval
   const storyCleanupIntervalRef = useRef(null);
 
-  // Load stories from localStorage on initial render
+  /**
+   * Effect hook to load stories from localStorage and set up cleanup interval
+   */
   useEffect(() => {
     const savedStories = localStorage.getItem('stories');
     if (savedStories) {
@@ -53,11 +66,12 @@ export default function Home() {
       }
     }
 
-    // Set up interval to check for expired stories
+    // Set up interval to check for expired stories (runs every minute)
     storyCleanupIntervalRef.current = setInterval(() => {
       cleanUpExpiredStories();
-    }, 60 * 1000); // Check every minute
+    }, 60 * 1000);
 
+    // Cleanup interval on component unmount
     return () => {
       if (storyCleanupIntervalRef.current) {
         clearInterval(storyCleanupIntervalRef.current);
@@ -65,7 +79,9 @@ export default function Home() {
     };
   }, []);
 
-  // Save stories to localStorage whenever they change
+  /**
+   * Effect hook to persist stories to localStorage when they change
+   */
   useEffect(() => {
     if (stories.length > 0) {
       localStorage.setItem('stories', JSON.stringify(stories));
@@ -74,6 +90,9 @@ export default function Home() {
     }
   }, [stories]);
 
+  /**
+   * Cleans up expired stories (older than 24 hours)
+   */
   const cleanUpExpiredStories = () => {
     const now = new Date();
     setStories(prevStories => {
@@ -91,6 +110,9 @@ export default function Home() {
     });
   };
 
+  /**
+   * Effect hook to handle token from URL and apply dark mode
+   */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
@@ -104,26 +126,44 @@ export default function Home() {
     }
   }, [location, darkMode]);
 
+  /**
+   * Toggles dark mode state and persists to localStorage
+   */
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('darkMode', newDarkMode);
   };
 
+  /**
+   * Triggers file input click for image upload
+   */
   const handleImageUpload = () => {
     fileInputRef.current.click();
   };
 
+  /**
+   * Triggers file input click for video upload
+   */
   const handleVideoUpload = () => {
     videoInputRef.current.click();
   };
 
+  /**
+   * Handles file selection and validation
+   * @param {Event} e - File input change event
+   */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setError(null);
 
+    /**
+     * Determines media type based on file type or extension
+     * @param {File} file - The file to check
+     * @returns {string|null} 'image', 'video', or null if unsupported
+     */
     const determineMediaType = (file) => {
       if (file.type.startsWith('image/')) return 'image';
       if (file.type.startsWith('video/')) return 'video';
@@ -144,7 +184,7 @@ export default function Home() {
       return;
     }
 
-    const MAX_FILE_SIZE = 25 * 1024 * 1024;
+    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
     if (file.size > MAX_FILE_SIZE) {
       setError('File size too large (max 25MB allowed)');
       return;
@@ -175,6 +215,9 @@ export default function Home() {
     reader.readAsDataURL(file);
   };
 
+  /**
+   * Adds the selected media as a new story
+   */
   const handleAddStory = () => {
     if (selectedMedia && mediaType) {
       const newStory = {
@@ -188,10 +231,17 @@ export default function Home() {
     }
   };
 
+  /**
+   * Removes a story by ID
+   * @param {string} id - The ID of the story to remove
+   */
   const handleRemoveStory = (id) => {
     setStories(stories.filter(story => story.id !== id));
   };
 
+  /**
+   * Closes the media preview and resets related state
+   */
   const handleClosePreview = () => {
     setSelectedMedia(null);
     setMediaType(null);
@@ -201,6 +251,10 @@ export default function Home() {
     if (videoInputRef.current) videoInputRef.current.value = '';
   };
 
+  /**
+   * Handles clicking on a story to view it
+   * @param {Object} story - The story object to view
+   */
   const handleStoryClick = (story) => {
     setSelectedMedia(story.url);
     setMediaType(story.type);
@@ -208,10 +262,16 @@ export default function Home() {
     setShowMediaPreview(true);
   };
 
+  /**
+   * Closes the error snackbar
+   */
   const handleCloseError = () => {
     setError(null);
   };
 
+  /**
+   * Dark mode style definitions
+   */
   const darkModeStyles = {
     backgroundColor: darkMode ? '#121212' : '#f5f5f5',
     color: darkMode ? '#ffffff' : '#000000',
@@ -239,7 +299,7 @@ export default function Home() {
         transition: 'background-color 0.3s ease'
       }}
     >
-      {/* Hidden file inputs */}
+      {/* Hidden file inputs for media upload */}
       <input
         type="file"
         ref={fileInputRef}
@@ -255,7 +315,7 @@ export default function Home() {
         style={{ display: 'none' }}
       />
 
-      {/* Left Sidebar */}
+      {/* Left Sidebar (currently empty) */}
       <Box sx={{ 
         display: { xs: 'none', md: 'block' },
         flexBasis: '25%',
@@ -297,7 +357,7 @@ export default function Home() {
             transition: 'background-color 0.3s ease'
           }}
         >
-          {/* Your Story */}
+          {/* Your Story (upload button) */}
           <Box 
             sx={{ 
               display: 'flex', 
@@ -541,7 +601,7 @@ export default function Home() {
         </Box>
       </Box>
 
-      {/* Right Sidebar */}
+      {/* Right Sidebar (Dark Mode Toggle) */}
       <Box sx={{ 
         display: { xs: 'none', lg: 'block' },
         flexBasis: '25%',
