@@ -56,7 +56,7 @@ const CreateEditWorkoutPlan = () => {
       localStorage.setItem('darkMode', prefersDark);
     }
     
-    // Apply dark mode class to body
+    // Apply dark mode class to body section
     if (darkMode) {
       document.body.classList.add('dark-mode');
     } else {
