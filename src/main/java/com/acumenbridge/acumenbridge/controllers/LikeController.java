@@ -15,18 +15,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Like Controller
+ * 
+ * Handles all like-related operations for posts including:
+ * - Liking posts
+ * - Unliking posts
+ * - Retrieving lists of users who liked a post
+ */
 @RestController
-@RequestMapping("/posts/{postId}/likes")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping("/posts/{postId}/likes") // Base path for like-related endpoints
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // Allow frontend requests with credentials
 public class LikeController {
 
-    @Autowired
+    @Autowired // Injects PostRepository for post operations
     private PostRepository postRepository;
 
-    @Autowired
+    @Autowired // Injects UserRepository for user lookups
     private UserRepository userRepository;
 
-    // --- same helper from PostController ---
+    /**
+     * Helper method to get the email of the currently authenticated user
+     * Supports multiple authentication types:
+     * - JWT tokens
+     * - OAuth2 authentication
+     * - Standard UserDetails
+     * 
+     * @return Email of logged-in user or null if not authenticated
+     */
     private String getLoggedInUserEmail() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof Jwt) {
@@ -39,12 +55,22 @@ public class LikeController {
         return null;
     }
 
+    /**
+     * Helper method to get the current authenticated user entity
+     * 
+     * @return Optional containing the User if found, empty if not authenticated
+     */
     private Optional<User> getCurrentUser() {
         String email = getLoggedInUserEmail();
         return userRepository.findByEmail(email);
     }
 
-    /** Like a post */
+    /**
+     * Like a post
+     * 
+     * @param postId ID of the post to like
+     * @return ResponseEntity with updated like set or error
+     */
     @PostMapping
     public ResponseEntity<?> like(@PathVariable String postId) {
         Optional<User> optUser = getCurrentUser();
@@ -56,6 +82,7 @@ public class LikeController {
         Post post = opt.get();
         String uid = optUser.get().getId();
 
+        // Add like if not already present
         Set<String> likes = post.getLikes();
         if (!likes.contains(uid)) {
             likes.add(uid);
@@ -65,7 +92,12 @@ public class LikeController {
         return ResponseEntity.ok(likes);
     }
 
-    /** Unlike a post */
+    /**
+     * Unlike a post
+     * 
+     * @param postId ID of the post to unlike
+     * @return ResponseEntity with updated like set or error
+     */
     @DeleteMapping
     public ResponseEntity<?> unlike(@PathVariable String postId) {
         Optional<User> optUser = getCurrentUser();
@@ -77,6 +109,7 @@ public class LikeController {
         Post post = opt.get();
         String uid = optUser.get().getId();
 
+        // Remove like if present
         Set<String> likes = post.getLikes();
         if (likes.contains(uid)) {
             likes.remove(uid);
@@ -86,7 +119,12 @@ public class LikeController {
         return ResponseEntity.ok(likes);
     }
 
-    /** List who has liked */
+    /**
+     * Get list of users who liked a post
+     * 
+     * @param postId ID of the post to check
+     * @return ResponseEntity with like set or error
+     */
     @GetMapping
     public ResponseEntity<?> listLikes(@PathVariable String postId) {
         Optional<Post> opt = postRepository.findById(postId);
