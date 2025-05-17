@@ -108,7 +108,7 @@ const WorkoutPlanForm = () => {
     };
     setFormData({
       ...formData,
-      exercises: updatedExercises,
+      exercises: updatedExercises, //update workouut plan exercises
     });
   };
 
@@ -144,7 +144,7 @@ const WorkoutPlanForm = () => {
       ],
     });
   };
-
+//remove exercises in form
   const removeExercise = (indexั้น) => {
     const updatedExercises = [...formData.exercises];
     updatedExercises.splice(index, 1);
@@ -170,7 +170,7 @@ const WorkoutPlanForm = () => {
       setLoading(false);
     }
   };
-
+//justify items
   if (loading) return (
     <div className={`flex justify-center items-center min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${darkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
@@ -224,7 +224,7 @@ const WorkoutPlanForm = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Information Section */}
+          {/* Basic Information Section update */}
           <div className={`${darkMode ? 'bg-blue-900/20' : 'bg-blue-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-blue-300' : 'text-blue-800'} mb-4`}>Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -283,7 +283,7 @@ const WorkoutPlanForm = () => {
             </div>
           </div>
 
-          {/* Target Muscles Section */}
+          {/* Target Muscles Section update */}
           <div className={`${darkMode ? 'bg-green-900/20' : 'bg-green-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-green-300' : 'text-green-800'} mb-4`}>Target Muscles</h2>
             <div className="flex mb-4">
@@ -297,7 +297,7 @@ const WorkoutPlanForm = () => {
               />
               <button
                 type="button"
-                onClick={addTargetMuscle}
+                onClick={addTargetMuscle} //add target muscles
                 className={`px-4 py-2 ${darkMode ? 'bg-green-700 hover:bg-green-800' : 'bg-green-500 hover:bg-green-600'} text-white rounded-r-lg transition-colors`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -308,7 +308,7 @@ const WorkoutPlanForm = () => {
             <div className="flex flex-wrap gap-2">
               {formData.targetMuscles.map((muscle) => (
                 <span
-                  key={muscle}
+                  key={muscle} //update key features
                   className={`inline-flex items-center px-3 py-1 ${darkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800'} rounded-full text-sm font-medium`}
                 >
                   {muscle}
@@ -326,7 +326,7 @@ const WorkoutPlanForm = () => {
             </div>
           </div>
 
-          {/* Exercises Section */}
+          {/* Exercises Section edit */}
           <div className={`${darkMode ? 'bg-purple-900/20' : 'bg-purple-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-purple-300' : 'text-purple-800'} mb-6`}>Exercises</h2>
             
@@ -424,7 +424,7 @@ const WorkoutPlanForm = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                 </svg>
-                Add Your Exercise
+                Add Your Exercise 
               </button>
             </div>
           </div>
@@ -458,7 +458,7 @@ const WorkoutPlanForm = () => {
   );
 };
 
-// Add this CSS to your global styles or component
+// Add this CSS to your global styles or component this form
 const darkModeStyles = `
   body.dark-mode {
     background-color: #111827;
