@@ -144,7 +144,7 @@ const WorkoutPlanForm = () => {
       ],
     });
   };
-
+//remove exercises in form
   const removeExercise = (indexั้น) => {
     const updatedExercises = [...formData.exercises];
     updatedExercises.splice(index, 1);
