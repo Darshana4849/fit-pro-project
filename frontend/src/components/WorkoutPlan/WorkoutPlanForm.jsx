@@ -283,7 +283,7 @@ const WorkoutPlanForm = () => {
             </div>
           </div>
 
-          {/* Target Muscles Section */}
+          {/* Target Muscles Section update */}
           <div className={`${darkMode ? 'bg-green-900/20' : 'bg-green-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-green-300' : 'text-green-800'} mb-4`}>Target Muscles</h2>
             <div className="flex mb-4">
