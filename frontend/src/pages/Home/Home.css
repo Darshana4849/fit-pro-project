@@ -1,45 +1,76 @@
+/* Main container for the home page */
 .home-container {
+    /* Flexbox layout to center content */
     display: flex;
     justify-content: center;
     align-items: center;
+    /* Full viewport height */
     min-height: 100vh;
+    /* Padding around the container */
     padding: 1rem;
+    /* Light gray background */
     background-color: #f3f4f6;
-  }
-  
-  .home-card {
+}
+
+/* Card styling for the main content */
+.home-card {
+    /* White background for the card */
     background-color: white;
+    /* Internal spacing */
     padding: 2rem;
+    /* Rounded corners */
     border-radius: 1rem;
+    /* Subtle shadow for depth */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* Center align text */
     text-align: center;
+    /* Maximum width with responsive behavior */
     max-width: 400px;
     width: 100%;
-  }
-  
-  .home-title {
+}
+
+/* Title styling */
+.home-title {
+    /* Large font size */
     font-size: 1.75rem;
+    /* Bold weight */
     font-weight: 600;
+    /* Dark gray color */
     color: #1f2937;
+    /* Bottom margin */
     margin-bottom: 1rem;
-  }
-  
-  .home-subtitle {
+}
+
+/* Subtitle styling */
+.home-subtitle {
+    /* Medium gray color */
     color: #6b7280;
+    /* Larger bottom margin */
     margin-bottom: 1.5rem;
-  }
-  
-  .home-button {
+}
+
+/* Button styling */
+.home-button {
+    /* Blue background */
     background-color: #2563eb;
+    /* White text */
     color: white;
+    /* Medium font weight */
     font-weight: 500;
+    /* Padding for button size */
     padding: 0.5rem 1.5rem;
+    /* Rounded corners */
     border-radius: 0.5rem;
+    /* Remove default border */
     border: none;
+    /* Pointer cursor on hover */
     cursor: pointer;
+    /* Smooth color transition */
     transition: background-color 0.2s ease;
-  }
-  
-  .home-button:hover {
+}
+
+/* Button hover state */
+.home-button:hover {
+    /* Darker blue on hover */
     background-color: #1d4ed8;
-  }
+}
