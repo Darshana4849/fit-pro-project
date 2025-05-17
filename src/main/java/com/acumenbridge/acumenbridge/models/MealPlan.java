@@ -7,35 +7,50 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "mealPlans")
+/**
+ * MealPlan Model
+ * 
+ * Represents a meal plan entity in the system, containing:
+ * - Basic plan information (title, description, diet type)
+ * - List of meals with their details
+ * - Creator information
+ * - Visibility settings
+ * - Timestamps for creation and modification
+ */
+@Document(collection = "mealPlans") // Specifies the MongoDB collection name
 public class MealPlan {
-    @Id
-    private String id;
+    @Id // Marks this field as the document identifier
+    private String id; // Unique identifier for the meal plan
     
-    private String userId;       // who created the plan
-    private String userName;     // display name of the creator
+    private String userId;       // ID of the user who created the plan
+    private String userName;     // Display name of the creator
     
-    private String title;
-    private String description;
-    private String dietType;     // e.g., Vegan, Keto, Mediterranean
-    private int durationDays;
-    private List<Meal> meals = new ArrayList<>();
-    private boolean isPublic;
+    private String title;        // Title of the meal plan
+    private String description;  // Description of the meal plan
+    private String dietType;     // Type of diet (e.g., Vegan, Keto, Mediterranean)
+    private int durationDays;    // Duration of the plan in days
+    private List<Meal> meals = new ArrayList<>(); // List of meals in the plan
+    private boolean isPublic;    // Visibility setting for the plan
     
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Instant createdAt;   // Timestamp when plan was created
+    private Instant updatedAt;   // Timestamp when plan was last updated
 
-    // Nested Meal class
+    /**
+     * Nested Meal class representing individual meals within a plan
+     */
     public static class Meal {
-        private String name;
-        private String description;
-        private String timeOfDay; // Breakfast, Lunch, Dinner, Snack
-        private List<Ingredient> ingredients = new ArrayList<>();
-        private String preparation;
-        private int calories;
+        private String name;            // Name of the meal
+        private String description;     // Description of the meal
+        private String timeOfDay;       // When the meal is consumed (Breakfast, Lunch, Dinner, Snack)
+        private List<Ingredient> ingredients = new ArrayList<>(); // List of ingredients
+        private String preparation;     // Preparation instructions
+        private int calories;           // Calorie count
         
         public Meal() {}
         
+        /**
+         * Constructor for creating a new Meal with basic information
+         */
         public Meal(String name, String description, String timeOfDay, String preparation, int calories) {
             this.name = name;
             this.description = description;
@@ -44,7 +59,7 @@ public class MealPlan {
             this.calories = calories;
         }
 
-        // Getters and setters
+        // Standard getters and setters
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
         public String getDescription() { return description; }
@@ -59,21 +74,26 @@ public class MealPlan {
         public void setCalories(int calories) { this.calories = calories; }
     }
 
-    // Nested Ingredient class
+    /**
+     * Nested Ingredient class representing ingredients within a meal
+     */
     public static class Ingredient {
-        private String name;
-        private String amount;
-        private String notes;
+        private String name;    // Name of the ingredient
+        private String amount;  // Required amount
+        private String notes;  // Additional notes about the ingredient
         
         public Ingredient() {}
         
+        /**
+         * Constructor for creating a new Ingredient
+         */
         public Ingredient(String name, String amount, String notes) {
             this.name = name;
             this.amount = amount;
             this.notes = notes;
         }
 
-        // Getters and setters
+        // Standard getters and setters
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
         public String getAmount() { return amount; }
@@ -82,14 +102,19 @@ public class MealPlan {
         public void setNotes(String notes) { this.notes = notes; }
     }
 
-    // Constructors
+    /**
+     * Default constructor initializes timestamps
+     */
     public MealPlan() {
         Instant now = Instant.now();
         this.createdAt = now;
         this.updatedAt = now;
     }
 
-    // Getters and setters
+    // --------------------------------------
+    // Standard Getters and Setters
+    // --------------------------------------
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getUserId() { return userId; }
