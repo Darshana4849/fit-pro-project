@@ -103,7 +103,7 @@ const MealPlanDetail = () => {
                       {meal.ingredients.map((ingredient, i) => (
                         <li key={i} className="text-gray-600">
                           <span className="font-medium">{ingredient.name}</span> ({ingredient.amount})
-                          {ingredient.notes && ` - ${ingredient.notes}`}
+                         
                         </li>
                       ))}
                     </ul>
