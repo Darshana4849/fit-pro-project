@@ -20,7 +20,7 @@ const MealPlanDetail = () => {
         setLoading(true);
         // Call service to get meal plan by ID
         const plan = await getMealPlanById(id);
-        setMealPlan(plan);
+        setMealPlan(plan); 
       } catch (err) {
         setError(err.message);
       } finally {
@@ -30,6 +30,7 @@ const MealPlanDetail = () => {
     fetchMealPlan();
   }, [id]);
 
+   // Loading state UI - shows a spinner
   if (loading) return (
     <div className="flex justify-center items-center h-64">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
