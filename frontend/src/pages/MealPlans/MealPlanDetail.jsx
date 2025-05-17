@@ -3,18 +3,24 @@ import { useParams, Link } from 'react-router-dom';
 import { getMealPlanById } from '../../services/mealPlanService';
 
 
+// MealPlanDetail component displays detailed information about a specific meal plan
 const MealPlanDetail = () => {
+  // Get the meal plan ID from URL parameters
   const { id } = useParams();
+
+  // State management for meal plan data, loading status, and errors
   const [mealPlan, setMealPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch meal plan data when component mounts or ID changes
   useEffect(() => {
     const fetchMealPlan = async () => {
       try {
         setLoading(true);
+        // Call service to get meal plan by ID
         const plan = await getMealPlanById(id);
-        setMealPlan(plan);
+        setMealPlan(plan); 
       } catch (err) {
         setError(err.message);
       } finally {
@@ -24,24 +30,28 @@ const MealPlanDetail = () => {
     fetchMealPlan();
   }, [id]);
 
+   // Loading state UI - shows a spinner
   if (loading) return (
     <div className="flex justify-center items-center h-64">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
   );
 
+  // Error state UI - shows error message
   if (error) return (
     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
       Error: {error}
     </div>
   );
 
+  // No meal plan found state UI
   if (!mealPlan) return (
     <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
       Meal plan not found
     </div>
   );
 
+  // Main render when data is successfully loaded
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-start mb-6">

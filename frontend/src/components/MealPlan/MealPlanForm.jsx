@@ -13,6 +13,8 @@ const MealPlanForm = () => {
     meals: [],
     isPublic: false,
   });
+
+  //const updated
   const [newMeal, setNewMeal] = useState({
     name: '',
     description: '',
