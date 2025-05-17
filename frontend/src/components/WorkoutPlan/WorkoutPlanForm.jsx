@@ -297,7 +297,7 @@ const WorkoutPlanForm = () => {
               />
               <button
                 type="button"
-                onClick={addTargetMuscle}
+                onClick={addTargetMuscle} //add target muscles
                 className={`px-4 py-2 ${darkMode ? 'bg-green-700 hover:bg-green-800' : 'bg-green-500 hover:bg-green-600'} text-white rounded-r-lg transition-colors`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
