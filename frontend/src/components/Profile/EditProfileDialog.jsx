@@ -13,6 +13,16 @@ import {
   Divider,
 } from '@mui/material';
 
+/**
+ * EditProfileDialog component provides a modal interface for users to edit their profile information.
+ * 
+ * @param {Boolean} open - Controls whether the dialog is open
+ * @param {Function} handleClose - Callback to close the dialog
+ * @param {Object} user - Current user data
+ * @param {Function} onSave - Callback when save is clicked
+ * @param {Function} onDelete - Callback when delete is confirmed
+ * @returns {JSX.Element} The rendered edit profile dialog
+ */
 function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
   // Local state for editable fields
   const [name, setName] = useState('');
@@ -26,15 +36,16 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
   const [passwordError, setPasswordError] = useState('');
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
 
-  // Determine if the user logged in via custom login.
+  // Determine if the user logged in via custom login (has password)
   const isCustomLogin = user && user.password && user.password.trim().length > 0;
 
-  // Initialize state when dialog opens
+  // Initialize state when dialog opens or user changes
   useEffect(() => {
     if (user) {
       setName(user.name);
       setAvatarPreview(user.avatar || '');
       setBannerPreview(user.banner || '');
+      // Reset password fields
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -42,6 +53,10 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
     }
   }, [user, open]);
 
+  /**
+   * Handles avatar file upload and sets preview
+   * @param {Event} event - File input change event
+   */
   const handleAvatarUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -50,6 +65,10 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
     }
   };
 
+  /**
+   * Handles banner file upload and sets preview
+   * @param {Event} event - File input change event
+   */
   const handleBannerUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -58,8 +77,11 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
     }
   };
 
+  /**
+   * Validates and prepares profile data for saving
+   */
   const handleSave = () => {
-    // For custom login users, validate password fields if changing password.
+    // For custom login users, validate password fields if changing password
     if (isCustomLogin && (newPassword !== '' || confirmPassword !== '')) {
       if (newPassword !== confirmPassword) {
         setPasswordError("New password and confirmation do not match.");
@@ -98,8 +120,11 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
     setOpenDeleteConfirm(false);
   };
 
+  /**
+   * Confirms and triggers profile deletion
+   */
   const confirmDelete = () => {
-    // Check if onDelete is provided and is a function before calling it.
+    // Check if onDelete is provided and is a function before calling it
     if (typeof onDelete === "function") {
       onDelete();
     } else {
@@ -111,10 +136,12 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
 
   return (
     <>
+      {/* Main Edit Profile Dialog */}
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg">
         <DialogTitle>Edit Profile</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            {/* Name Field */}
             <TextField
               margin="dense"
               label="Name"
@@ -123,6 +150,8 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+            
+            {/* Read-only Email Field */}
             <TextField
               margin="dense"
               label="Email"
@@ -131,7 +160,8 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
               value={user?.email || ''}
               InputProps={{ readOnly: true }}
             />
-            {/* Render password change fields only for custom login users */}
+            
+            {/* Password Change Fields (only for custom login users) */}
             {isCustomLogin && (
               <>
                 <TextField
@@ -166,7 +196,8 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
                 )}
               </>
             )}
-            {/* File Upload for Avatar and Banner */}
+            
+            {/* File Upload Buttons */}
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 2 }}>
               <Button variant="outlined" component="label">
                 Upload Avatar
@@ -177,8 +208,10 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
                 <input type="file" hidden accept="image/*" onChange={handleBannerUpload} />
               </Button>
             </Box>
+            
             {/* Preview Section */}
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: 2 }}>
+              {/* Avatar Preview */}
               {avatarPreview ? (
                 <Avatar src={avatarPreview} alt={name} sx={{ width: 56, height: 56 }} />
               ) : (
@@ -198,6 +231,8 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
                   </Typography>
                 </Box>
               )}
+              
+              {/* Banner Preview */}
               {bannerPreview && (
                 <Box
                   component="img"
@@ -223,7 +258,7 @@ function EditProfileDialog({ open, handleClose, user, onSave, onDelete }) {
         </DialogActions>
       </Dialog>
 
-      {/* Confirmation Dialog for Deletion */}
+      {/* Delete Confirmation Dialog */}
       <Dialog open={openDeleteConfirm} onClose={closeDeleteDialog}>
         <DialogTitle>Confirm Delete Profile</DialogTitle>
         <DialogContent>

@@ -1,3 +1,4 @@
+// src/main/java/com/acumenbridge/acumenbridge/services/ConnectionService.java
 package com.acumenbridge.acumenbridge.services;
 
 import com.acumenbridge.acumenbridge.models.User;
@@ -8,6 +9,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class for managing user connections (following/followers relationships).
+ * Provides functionality for following/unfollowing users and retrieving connection lists.
+ */
 @Service
 public class ConnectionService {
 

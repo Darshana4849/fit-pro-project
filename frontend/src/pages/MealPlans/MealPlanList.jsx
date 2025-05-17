@@ -2,17 +2,22 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getMealPlans, getPublicMealPlans, deleteMealPlan } from '../../services/mealPlanService';
 
+/**
+ * MealPlanList component displays a list of meal plans with filtering, sorting, and CRUD operations.
+ * Supports dark mode and shows detailed meal information when expanded.
+ */
 const MealPlanList = () => {
-  const [mealPlans, setMealPlans] = useState([]);
-  const [showPublic, setShowPublic] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
-  const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
-  const [expandedPlanId, setExpandedPlanId] = useState(null);
+  // State management:
+  const [mealPlans, setMealPlans] = useState([]); // Stores the list of meal plans
+  const [showPublic, setShowPublic] = useState(false); // Toggles between public and private plans
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
+  const [deletingId, setDeletingId] = useState(null); // Tracks which plan is being deleted
+  const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false); // Dark mode state
+  const [expandedPlanId, setExpandedPlanId] = useState(null); // Tracks which plan is expanded
 
+  // Initialize dark mode from localStorage or system preference
   useEffect(() => {
-    // Initialize dark mode from local storage or system preference
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode !== null) {
       setDarkMode(savedDarkMode === 'true');
@@ -30,6 +35,7 @@ const MealPlanList = () => {
     }
   }, [darkMode]);
 
+  // Fetch meal plans when component mounts or showPublic changes
   useEffect(() => {
     const fetchMealPlans = async () => {
       try {
@@ -48,6 +54,7 @@ const MealPlanList = () => {
     fetchMealPlans();
   }, [showPublic]);
 
+  // Handle meal plan deletion
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this meal plan?')) {
       try {
@@ -62,13 +69,14 @@ const MealPlanList = () => {
     }
   };
 
+  // Toggle dark mode
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('darkMode', newDarkMode);
   };
 
-  // Function to get the appropriate color classes based on difficulty level
+  // Get color classes based on difficulty level (dark mode aware)
   const getDifficultyColorClasses = (difficulty) => {
     if (darkMode) {
       switch(difficulty?.toLowerCase()) {
@@ -87,11 +95,12 @@ const MealPlanList = () => {
     }
   };
   
+  // Toggle expanded view for a meal plan
   const toggleExpandPlan = (id) => {
     setExpandedPlanId(expandedPlanId === id ? null : id);
   };
 
-  // Function to get the appropriate color classes based on plan type
+  // Get color classes based on plan type (dark mode aware)
   const getTypeColorClasses = (type) => {
     if (darkMode) {
       switch(type?.toLowerCase()) {
@@ -110,12 +119,14 @@ const MealPlanList = () => {
     }
   };
 
+  // Loading state UI
   if (loading) return (
     <div className={`flex justify-center items-center min-h-screen ${darkMode ? 'bg-gray-900' : ''}`}>
       <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${darkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
     </div>
   );
 
+  // Error state UI
   if (error) return (
     <div className={`max-w-2xl mx-auto mt-8 p-4 ${darkMode ? 'bg-red-900/30 border-red-700' : 'bg-red-50 border-red-500'} border-l-4`}>
       <p className={`${darkMode ? 'text-red-400' : 'text-red-700'}`}>Error: {error}</p>
@@ -128,9 +139,11 @@ const MealPlanList = () => {
     </div>
   );
 
+  // Main component render
   return (
     <div className={`${darkMode ? 'bg-gray-900 text-gray-100' : ''} min-h-screen transition-colors duration-200`}>
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header section with title and action buttons */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Meal Plans</h1>
@@ -139,6 +152,7 @@ const MealPlanList = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            {/* Dark mode toggle button */}
             <button
               onClick={toggleDarkMode}
               className={`px-4 py-2 rounded-md border ${
@@ -161,16 +175,7 @@ const MealPlanList = () => {
                 </span>
               )}
             </button>
-            {/* <button
-              onClick={() => setShowPublic(!showPublic)}
-              className={`px-4 py-2 rounded-md border ${
-                darkMode 
-                  ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' 
-                  : `${showPublic ? 'bg-gray-100' : 'bg-white'} border-gray-300 hover:bg-gray-50`
-              } transition-colors`}
-            >
-              {showPublic ? 'Show My Plans' : 'Show Public Plans'}
-            </button> */}
+            {/* Create new plan button */}
             <Link
               to="/meal-plans-form"
               className={`px-4 py-2 ${
@@ -184,6 +189,7 @@ const MealPlanList = () => {
           </div>
         </div>
 
+        {/* Empty state */}
         {mealPlans.length === 0 ? (
           <div className={`${
             darkMode 
@@ -209,6 +215,7 @@ const MealPlanList = () => {
             </Link>
           </div>
         ) : (
+          /* Meal plans grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mealPlans.map((plan) => (
               <div 
@@ -220,14 +227,14 @@ const MealPlanList = () => {
                 } border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow`}
               >
                 <div className="p-5">
-                  {/* Title section */}
+                  {/* Plan title */}
                   <div className="mb-4">
                     <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       {plan.title}
                     </h2>
                   </div>
 
-                  {/* Difficulty, duration, and type */}
+                  {/* Plan metadata (difficulty, duration, type) */}
                   <div className="flex items-center mb-4 gap-2">
                     <span className={`px-3 py-1 text-sm rounded-full ${getDifficultyColorClasses(plan.difficulty || plan.dietType)}`}>
                       {plan.difficulty || plan.dietType || 'Standard'}
@@ -247,19 +254,19 @@ const MealPlanList = () => {
                     </span>
                   </div>
 
-                  {/* Description */}
+                  {/* Plan description */}
                   <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
                     {plan.description}
                   </p>
 
-                  {/* Exercises/Meals section */}
+                  {/* Meals/Exercises section */}
                   <div className="mb-6">
                     <h3 className={`${darkMode ? 'text-gray-200' : 'text-gray-700'} font-medium mb-2`}>
                       {plan.meals ? 'Meals:' : 'Exercises:'}
                     </h3>
                     
                     <div className="space-y-3">
-                      {/* If we have exercises */}
+                      {/* Exercises list */}
                       {plan.exercises && plan.exercises.map((exercise, idx) => (
                         <div key={idx} className="flex justify-between items-center">
                           <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -271,7 +278,7 @@ const MealPlanList = () => {
                         </div>
                       ))}
                       
-                      {/* If we have meals instead of exercises */}
+                      {/* Meals list (first 3 shown by default) */}
                       {plan.meals && plan.meals.slice(0, 3).map((meal, idx) => (
                         <div key={idx} className="flex justify-between items-center">
                           <span className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -283,7 +290,7 @@ const MealPlanList = () => {
                         </div>
                       ))}
 
-                      {/* Show if there are more meals than we displayed */}
+                      {/* Show remaining meals count if more than 3 */}
                       {plan.meals && plan.meals.length > 3 && !expandedPlanId && (
                         <div className={`text-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                           +{plan.meals.length - 3} more meals
@@ -291,7 +298,7 @@ const MealPlanList = () => {
                       )}
                     </div>
                     
-                    {/* Toggle button to expand/collapse details */}
+                    {/* Expand/collapse button for meal details */}
                     {plan.meals && plan.meals.length > 0 && (
                       <button
                         onClick={() => toggleExpandPlan(plan.id)}
@@ -315,7 +322,7 @@ const MealPlanList = () => {
                     )}
                   </div>
                   
-                  {/* Expanded meal details */}
+                  {/* Expanded meal details section */}
                   {expandedPlanId === plan.id && plan.meals && plan.meals.length > 0 && (
                     <div className={`space-y-4 mb-6 ${darkMode ? 'bg-gray-900/30' : 'bg-gray-50'} p-4 rounded-lg`}>
                       <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'} pb-2 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -351,7 +358,7 @@ const MealPlanList = () => {
                             {meal.calories} calories
                           </div>
                           
-                          {/* Ingredients */}
+                          {/* Ingredients list */}
                           {meal.ingredients && meal.ingredients.length > 0 && (
                             <div className="mb-3">
                               <h5 className={`text-xs font-semibold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>
@@ -371,7 +378,7 @@ const MealPlanList = () => {
                             </div>
                           )}
                           
-                          {/* Preparation instructions - collapsed by default */}
+                          {/* Preparation instructions (collapsible) */}
                           {meal.preparation && (
                             <details className={`mt-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                               <summary className={`cursor-pointer font-medium ${darkMode ? 'text-blue-300' : 'text-blue-600'} hover:underline`}>
@@ -385,7 +392,7 @@ const MealPlanList = () => {
                     </div>
                   )}
 
-                  {/* Action buttons */}
+                  {/* Action buttons (Edit/Delete) */}
                   <div className={`flex justify-between ${darkMode ? 'border-gray-700' : 'border-gray-100'} ${expandedPlanId === plan.id ? 'border-t pt-4' : ''}`}>
                     <Link
                       to={`/meal-plans/${plan.id}/edit`}
@@ -426,7 +433,7 @@ const MealPlanList = () => {
   );
 };
 
-// Add this CSS to your global styles or component
+// Dark mode CSS styles
 const darkModeStyles = `
   body.dark-mode {
     background-color: #111827;
@@ -434,7 +441,7 @@ const darkModeStyles = `
   }
 `;
 
-// You can include this style tag directly in your component or add it to your global CSS
+// Inject dark mode styles into the document head
 const styleEl = document.createElement('style');
 styleEl.textContent = darkModeStyles;
 document.head.appendChild(styleEl);

@@ -3,13 +3,20 @@ import { Link } from 'react-router-dom';
 import { getWorkoutPlans, getPublicWorkoutPlans, deleteWorkoutPlan } from '../../services/workoutPlanService';
 
 const WorkoutPlanList = () => {
+  // State for storing workout plans
   const [workoutPlans, setWorkoutPlans] = useState([]);
+  // State to toggle between public and private plans
   const [showPublic, setShowPublic] = useState(false);
+  // Loading state
   const [loading, setLoading] = useState(true);
+  // Error state
   const [error, setError] = useState(null);
+  // Track which plan is being deleted
   const [deletingId, setDeletingId] = useState(null);
+  // Dark mode state with localStorage persistence
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
 
+  // Effect for initializing and toggling dark mode
   useEffect(() => {
     // Initialize dark mode from local storage or system preference
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -29,10 +36,12 @@ const WorkoutPlanList = () => {
     }
   }, [darkMode]);
 
+  // Effect for fetching workout plans
   useEffect(() => {
     const fetchWorkoutPlans = async () => {
       try {
         setLoading(true);
+        // Fetch either public or private plans based on showPublic state
         const data = showPublic 
           ? await getPublicWorkoutPlans()
           : await getWorkoutPlans();
@@ -47,11 +56,13 @@ const WorkoutPlanList = () => {
     fetchWorkoutPlans();
   }, [showPublic]);
 
+  // Handler for deleting a workout plan
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this workout plan?')) {
       try {
         setDeletingId(id);
         await deleteWorkoutPlan(id);
+        // Remove deleted plan from state
         setWorkoutPlans(workoutPlans.filter(plan => plan.id !== id));
       } catch (err) {
         setError(err.message);
@@ -61,18 +72,21 @@ const WorkoutPlanList = () => {
     }
   };
 
+  // Toggle dark mode and persist to localStorage
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('darkMode', newDarkMode);
   };
 
+  // Loading state UI
   if (loading) return (
     <div className={`flex justify-center items-center min-h-screen ${darkMode ? 'bg-gray-900' : ''}`}>
       <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${darkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
     </div>
   );
 
+  // Error state UI
   if (error) return (
     <div className={`max-w-2xl mx-auto mt-8 p-4 ${darkMode ? 'bg-red-900/30 border-red-700' : 'bg-red-50 border-red-500'} border-l-4`}>
       <p className={`${darkMode ? 'text-red-400' : 'text-red-700'}`}>Error: {error}</p>
@@ -85,9 +99,11 @@ const WorkoutPlanList = () => {
     </div>
   );
 
+  // Main component render
   return (
     <div className={`${darkMode ? 'bg-gray-900 text-gray-100' : ''} min-h-screen transition-colors duration-200`}>
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header section with title and action buttons */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Workout Plans</h1>
@@ -96,6 +112,7 @@ const WorkoutPlanList = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            {/* Dark mode toggle button */}
             <button
               onClick={toggleDarkMode}
               className={`px-4 py-2 rounded-md border ${
@@ -109,27 +126,17 @@ const WorkoutPlanList = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
-                  
                 </span>
               ) : (
                 <span className="flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
-                  
                 </span>
               )}
             </button>
-            {/* <button
-              onClick={() => setShowPublic(!showPublic)}
-              className={`px-4 py-2 rounded-md border ${
-                darkMode 
-                  ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' 
-                  : `${showPublic ? 'bg-gray-100' : 'bg-white'} border-gray-300 hover:bg-gray-50`
-              } transition-colors`}
-            >
-              {showPublic ? 'Show My Plans' : 'Show Public Plans'}
-            </button> */}
+            
+            {/* Create New Plan button */}
             <Link
               to="/workout-plans-form"
               className={`px-4 py-2 ${
@@ -143,6 +150,7 @@ const WorkoutPlanList = () => {
           </div>
         </div>
 
+        {/* Empty state for no workout plans */}
         {workoutPlans.length === 0 ? (
           <div className={`${
             darkMode 
@@ -168,6 +176,7 @@ const WorkoutPlanList = () => {
             </Link>
           </div>
         ) : (
+          /* Grid of workout plan cards */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {workoutPlans.map((plan) => (
               <div 
@@ -180,10 +189,12 @@ const WorkoutPlanList = () => {
               >
                 <div className="p-5">
                   <div className="flex flex-col mb-4">
+                    {/* Plan title */}
                     <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-3`}>
                       {plan.title || "Untitled Workout Plan"}
                     </h2>
                     
+                    {/* Difficulty and duration */}
                     <div className="flex items-center gap-3 mb-4">
                       <span className={`px-3 py-1 text-sm rounded-full ${
                         darkMode
@@ -209,11 +220,12 @@ const WorkoutPlanList = () => {
                       </div>
                     </div>
                     
+                    {/* Plan description */}
                     <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
                       {plan.description || "No description provided."}
                     </p>
 
-                    {/* Target Muscles */}
+                    {/* Target Muscles section */}
                     {plan.targetMuscles && plan.targetMuscles.length > 0 && (
                       <div className="mb-4">
                         <h3 className={`font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-700'} mb-2`}>Target Muscles:</h3>
@@ -235,7 +247,7 @@ const WorkoutPlanList = () => {
                     )}
                   </div>
                   
-                  {/* Exercises Section */}
+                  {/* Exercises section */}
                   <div className="mb-5">
                     <h3 className={`font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-700'} mb-2`}>Exercises:</h3>
                     <div className="space-y-2">
@@ -257,6 +269,7 @@ const WorkoutPlanList = () => {
                         </div>
                       )}
                       
+                      {/* Show "more exercises" if there are more than 3 */}
                       {plan.exercises && plan.exercises.length > 3 && (
                         <div className={`text-center text-sm pt-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                           + {plan.exercises.length - 3} more exercises
@@ -265,8 +278,9 @@ const WorkoutPlanList = () => {
                     </div>
                   </div>
                   
-                  {/* Action Buttons */}
+                  {/* Action buttons */}
                   <div className="flex justify-between gap-4 mt-6">
+                    {/* Edit button */}
                     <Link
                       to={`/workout-plans/${plan.id}/edit`}
                       className={`px-4 py-3 ${
@@ -283,6 +297,7 @@ const WorkoutPlanList = () => {
                       </span>
                     </Link>
                     
+                    {/* Delete button with loading state */}
                     <button
                       onClick={() => handleDelete(plan.id)}
                       disabled={deletingId === plan.id}
@@ -309,6 +324,7 @@ const WorkoutPlanList = () => {
                       </span>
                     </button>
                     
+                    {/* View button */}
                     <Link
                       to={`/workout-plans/${plan.id}`}
                       className={`px-4 py-3 ${
@@ -336,7 +352,7 @@ const WorkoutPlanList = () => {
   );
 };
 
-// Add this CSS to your global styles or component
+// Dark mode CSS styles
 const darkModeStyles = `
   body.dark-mode {
     background-color: #111827;
@@ -344,7 +360,7 @@ const darkModeStyles = `
   }
 `;
 
-// You can include this style tag directly in your component or add it to your global CSS
+// Inject dark mode styles into the document head
 const styleEl = document.createElement('style');
 styleEl.textContent = darkModeStyles;
 document.head.appendChild(styleEl);

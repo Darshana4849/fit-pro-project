@@ -6,22 +6,39 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Configuration class for static resource handling.
- * Maps virtual URL paths to physical file system locations for serving static files.
+ * Static Resource Configuration Class
+ * 
+ * Configures how static resources (like uploaded files) are served by the application.
+ * Maps virtual URL paths to physical file system locations, allowing files to be
+ * accessed via HTTP requests while being stored on the server's filesystem.
+ * 
+ * Implements WebMvcConfigurer to customize Spring MVC configuration.
  */
-@Configuration // Marks this class as a Spring configuration class
+@Configuration // Indicates this class contains Spring bean definitions
 public class StaticResourceConfig implements WebMvcConfigurer {
 
     /**
-     * Configures resource handlers to serve static files from the filesystem.
+     * Configures resource handlers to map URL patterns to filesystem locations.
      * 
-     * @param registry The ResourceHandlerRegistry used to add resource handlers
+     * This method:
+     * - Creates a mapping between a URL path and a physical directory
+     * - Enables serving static files from the filesystem through HTTP
+     * - Makes uploaded files accessible via web URLs
+     * 
+     * @param registry The ResourceHandlerRegistry that maintains the mappings between
+     *                 URL patterns and resource locations
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Maps any request to /uploads/** to serve static resources from the "uploads/" directory
-        // in the filesystem (relative to the application root)
-        registry.addResourceHandler("/uploads/**")  // URL path pattern
-                .addResourceLocations("file:uploads/");  // Corresponding filesystem location
+        // Maps HTTP requests matching "/uploads/**" to files in the "uploads/" directory
+        // "file:uploads/" indicates a filesystem-relative path (not classpath)
+        // The trailing slash is important for proper directory resolution
+        registry.addResourceHandler("/uploads/**")  // URL pattern to match
+                .addResourceLocations("file:uploads/");  // Physical location in filesystem
+        
+        // Additional mappings could be added here for other resource locations
+        // Example:
+        // registry.addResourceHandler("/other-resources/**")
+        //         .addResourceLocations("file:/path/to/other/resources/");
     }
 }

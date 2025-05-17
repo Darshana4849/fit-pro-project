@@ -25,11 +25,20 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 
+/**
+ * Home component - Main page of the application with stories, posts, and media upload functionality
+ * @returns {JSX.Element} The home page component
+ */
 export default function Home() {
+  // Router hooks
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Refs for file inputs
   const fileInputRef = useRef(null);
   const videoInputRef = useRef(null);
+  
+  // State management
   const [stories, setStories] = useState([]);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
@@ -38,7 +47,72 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [isNewMedia, setIsNewMedia] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
+  
+  // Ref for story cleanup interval
+  const storyCleanupIntervalRef = useRef(null);
 
+  /**
+   * Effect hook to load stories from localStorage and set up cleanup interval
+   */
+  useEffect(() => {
+    const savedStories = localStorage.getItem('stories');
+    if (savedStories) {
+      try {
+        const parsedStories = JSON.parse(savedStories);
+        setStories(parsedStories);
+      } catch (e) {
+        console.error('Failed to parse saved stories', e);
+        localStorage.removeItem('stories');
+      }
+    }
+
+    // Set up interval to check for expired stories (runs every minute)
+    storyCleanupIntervalRef.current = setInterval(() => {
+      cleanUpExpiredStories();
+    }, 60 * 1000);
+
+    // Cleanup interval on component unmount
+    return () => {
+      if (storyCleanupIntervalRef.current) {
+        clearInterval(storyCleanupIntervalRef.current);
+      }
+    };
+  }, []);
+
+  /**
+   * Effect hook to persist stories to localStorage when they change
+   */
+  useEffect(() => {
+    if (stories.length > 0) {
+      localStorage.setItem('stories', JSON.stringify(stories));
+    } else {
+      localStorage.removeItem('stories');
+    }
+  }, [stories]);
+
+  /**
+   * Cleans up expired stories (older than 24 hours)
+   */
+  const cleanUpExpiredStories = () => {
+    const now = new Date();
+    setStories(prevStories => {
+      const updatedStories = prevStories.filter(story => {
+        const storyDate = new Date(story.timestamp);
+        const hoursDiff = (now - storyDate) / (1000 * 60 * 60);
+        return hoursDiff < 24; // Keep stories younger than 24 hours
+      });
+      
+      // Only update if some stories were removed
+      if (updatedStories.length !== prevStories.length) {
+        return updatedStories;
+      }
+      return prevStories;
+    });
+  };
+
+  /**
+   * Effect hook to handle token from URL and apply dark mode
+   */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
@@ -52,26 +126,44 @@ export default function Home() {
     }
   }, [location, darkMode]);
 
+  /**
+   * Toggles dark mode state and persists to localStorage
+   */
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('darkMode', newDarkMode);
   };
 
+  /**
+   * Triggers file input click for image upload
+   */
   const handleImageUpload = () => {
     fileInputRef.current.click();
   };
 
+  /**
+   * Triggers file input click for video upload
+   */
   const handleVideoUpload = () => {
     videoInputRef.current.click();
   };
 
+  /**
+   * Handles file selection and validation
+   * @param {Event} e - File input change event
+   */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setError(null);
 
+    /**
+     * Determines media type based on file type or extension
+     * @param {File} file - The file to check
+     * @returns {string|null} 'image', 'video', or null if unsupported
+     */
     const determineMediaType = (file) => {
       if (file.type.startsWith('image/')) return 'image';
       if (file.type.startsWith('video/')) return 'video';
@@ -92,7 +184,7 @@ export default function Home() {
       return;
     }
 
-    const MAX_FILE_SIZE = 25 * 1024 * 1024;
+    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
     if (file.size > MAX_FILE_SIZE) {
       setError('File size too large (max 25MB allowed)');
       return;
@@ -123,6 +215,9 @@ export default function Home() {
     reader.readAsDataURL(file);
   };
 
+  /**
+   * Adds the selected media as a new story
+   */
   const handleAddStory = () => {
     if (selectedMedia && mediaType) {
       const newStory = {
@@ -136,10 +231,17 @@ export default function Home() {
     }
   };
 
+  /**
+   * Removes a story by ID
+   * @param {string} id - The ID of the story to remove
+   */
   const handleRemoveStory = (id) => {
     setStories(stories.filter(story => story.id !== id));
   };
 
+  /**
+   * Closes the media preview and resets related state
+   */
   const handleClosePreview = () => {
     setSelectedMedia(null);
     setMediaType(null);
@@ -149,6 +251,10 @@ export default function Home() {
     if (videoInputRef.current) videoInputRef.current.value = '';
   };
 
+  /**
+   * Handles clicking on a story to view it
+   * @param {Object} story - The story object to view
+   */
   const handleStoryClick = (story) => {
     setSelectedMedia(story.url);
     setMediaType(story.type);
@@ -156,10 +262,16 @@ export default function Home() {
     setShowMediaPreview(true);
   };
 
+  /**
+   * Closes the error snackbar
+   */
   const handleCloseError = () => {
     setError(null);
   };
 
+  /**
+   * Dark mode style definitions
+   */
   const darkModeStyles = {
     backgroundColor: darkMode ? '#121212' : '#f5f5f5',
     color: darkMode ? '#ffffff' : '#000000',
@@ -187,12 +299,12 @@ export default function Home() {
         transition: 'background-color 0.3s ease'
       }}
     >
-      {/* Hidden file inputs */}
+      {/* Hidden file inputs for media upload */}
       <input
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/,video/"
+        accept="image/*,video/*"
         style={{ display: 'none' }}
       />
       <input
@@ -203,7 +315,7 @@ export default function Home() {
         style={{ display: 'none' }}
       />
 
-      {/* Left Sidebar */}
+      {/* Left Sidebar (currently empty) */}
       <Box sx={{ 
         display: { xs: 'none', md: 'block' },
         flexBasis: '25%',
@@ -245,7 +357,7 @@ export default function Home() {
             transition: 'background-color 0.3s ease'
           }}
         >
-          {/* Your Story */}
+          {/* Your Story (upload button) */}
           <Box 
             sx={{ 
               display: 'flex', 
@@ -285,77 +397,109 @@ export default function Home() {
           </Box>
 
           {/* Existing Stories */}
-          {stories.map((story) => (
-            <Box 
-              key={story.id} 
-              sx={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center',
-                minWidth: 80,
-                position: 'relative'
-              }}
-            >
-              <Box
-                sx={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: '50%',
-                  border: '2px solid',
-                  borderColor: 'primary.main',
-                  display: 'flex',
+          {stories.map((story) => {
+            const storyDate = new Date(story.timestamp);
+            const now = new Date();
+            const hoursDiff = (now - storyDate) / (1000 * 60 * 60);
+            const timeLeft = Math.max(0, 24 - hoursDiff).toFixed(1);
+            
+            return (
+              <Box 
+                key={story.id} 
+                sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                  cursor: 'pointer'
+                  minWidth: 80,
+                  position: 'relative'
                 }}
-                onClick={() => handleStoryClick(story)}
               >
-                {story.type === 'image' ? (
-                  <img 
-                    src={story.url} 
-                    alt="Story" 
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover' 
-                    }} 
-                  />
-                ) : (
-                  <video
-                    src={story.url}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover'
-                    }}
-                  />
-                )}
+                <Box
+                  sx={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: '50%',
+                    border: '2px solid',
+                    borderColor: hoursDiff < 24 ? 'primary.main' : 'error.main',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    position: 'relative'
+                  }}
+                  onClick={() => handleStoryClick(story)}
+                >
+                  {story.type === 'image' ? (
+                    <img 
+                      src={story.url} 
+                      alt="Story" 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'cover',
+                        opacity: hoursDiff < 24 ? 1 : 0.7
+                      }} 
+                    />
+                  ) : (
+                    <video
+                      src={story.url}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        opacity: hoursDiff < 24 ? 1 : 0.7
+                      }}
+                    />
+                  )}
+                  {hoursDiff < 24 && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: 4,
+                        bgcolor: 'rgba(0,0,0,0.3)',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          height: '100%',
+                          width: `${(1 - hoursDiff / 24) * 100}%`,
+                          bgcolor: 'primary.main',
+                          transition: 'width 0.5s linear'
+                        }}
+                      />
+                    </Box>
+                  )}
+                </Box>
+                <Typography variant="caption" sx={{ mt: 1, color: darkModeStyles.color }}>
+                  {hoursDiff < 24 ? `${timeLeft}h left` : 'Expired'}
+                </Typography>
+                <IconButton
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    bgcolor: darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)',
+                    color: darkMode ? 'white' : 'black',
+                    '&:hover': {
+                      bgcolor: darkMode ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.9)'
+                    }
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveStory(story.id);
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
               </Box>
-              <Typography variant="caption" sx={{ mt: 1, color: darkModeStyles.color }}>
-                Your Story
-              </Typography>
-              <IconButton
-                size="small"
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
-                  bgcolor: darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)',
-                  color: darkMode ? 'white' : 'black',
-                  '&:hover': {
-                    bgcolor: darkMode ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.9)'
-                  }
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveStory(story.id);
-                }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Box>
-          ))}
+            );
+          })}
         </Paper>
 
         {/* Create Post Card */}
@@ -457,36 +601,35 @@ export default function Home() {
         </Box>
       </Box>
 
-      {/* Right Sidebar */}
+      {/* Right Sidebar (Dark Mode Toggle) */}
       <Box sx={{ 
-  display: { xs: 'none', lg: 'block' },
-  flexBasis: '25%',
-  maxWidth: 80,
-  position: 'sticky',
-  top: 16,
-  height: 'fit-content',
-  bgcolor: darkModeStyles.paperBg,
-  borderRadius: 2,
-  boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
-  transition: 'background-color 0.3s ease',
-  p: 2
-}}>
+        display: { xs: 'none', lg: 'block' },
+        flexBasis: '25%',
+        maxWidth: 80,
+        position: 'sticky',
+        top: 16,
+        height: 'fit-content',
+        bgcolor: darkModeStyles.paperBg,
+        borderRadius: 2,
+        boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
+        transition: 'background-color 0.3s ease',
+        p: 2
+      }}>
         <List>
-                    
           <ListItem sx={{ p: 0 }}>
-  <IconButton 
-    onClick={toggleDarkMode} 
-    size="small"
-    sx={{
-      color: darkMode ? 'warning.main' : 'text.primary',
-      '&:hover': {
-        bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
-      }
-    }}
-  >
-    {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-  </IconButton>
-</ListItem>
+            <IconButton 
+              onClick={toggleDarkMode} 
+              size="small"
+              sx={{
+                color: darkMode ? 'warning.main' : 'text.primary',
+                '&:hover': {
+                  bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
+                }
+              }}
+            >
+              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+          </ListItem>
         </List>
       </Box>
 

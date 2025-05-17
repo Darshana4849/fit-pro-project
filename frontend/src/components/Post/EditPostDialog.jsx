@@ -6,14 +6,27 @@ import {
 } from '@mui/material';
 import { updatePost } from '../../services/postService';
 
+/**
+ * Dialog component for editing a post's description.
+ * 
+ * @param {Object} props - Component props
+ * @param {Object} props.post - The post object being edited
+ * @param {boolean} props.open - Controls whether the dialog is open
+ * @param {Function} props.onClose - Callback when dialog is closed
+ * @param {Function} props.onSaved - Callback when post is successfully saved
+ * @returns {JSX.Element} The EditPostDialog component
+ */
 export default function EditPostDialog({ post, open, onClose, onSaved }) {
+  // State for edited description and saving status
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Initialize description when post changes
   useEffect(() => {
     if (post) setDescription(post.description || '');
   }, [post]);
 
+  // Handle saving the edited post
   const handleSave = async () => {
     setSaving(true);
     try {

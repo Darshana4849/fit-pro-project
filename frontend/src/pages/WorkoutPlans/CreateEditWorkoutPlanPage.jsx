@@ -6,9 +6,16 @@ import {
   updateWorkoutPlan,
 } from '../../services/workoutPlanService';
 
+/**
+ * CreateEditWorkoutPlan component handles both creating new workout plans
+ * and editing existing ones with a comprehensive form interface.
+ */
 const CreateEditWorkoutPlan = () => {
+  // Get route parameters and navigation hook
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // Main form state
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -18,13 +25,19 @@ const CreateEditWorkoutPlan = () => {
     exercises: [],
     isPublic: false,
   });
+
+  // State for adding new target muscle
   const [newTargetMuscle, setNewTargetMuscle] = useState('');
+
+  // State for adding new exercise
   const [newExercise, setNewExercise] = useState({
     name: '',
     sets: 3,
     reps: '8-12',
     duration: '',
   });
+
+  // State for editing existing exercise
   const [editingExerciseIndex, setEditingExerciseIndex] = useState(null);
   const [editingExercise, setEditingExercise] = useState({
     name: '',
@@ -32,11 +45,16 @@ const CreateEditWorkoutPlan = () => {
     reps: '8-12',
     duration: '',
   });
+
+  // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
 
-  // Validation function for letters and spaces only
+  /**
+   * Validation function to allow only letters and spaces in input fields
+   * @param {Event} e - Keyboard event
+   */
   const allowOnlyLetters = (e) => {
     const regex = /^[A-Za-z\s]*$/;
     if (!regex.test(e.key)) {
@@ -44,7 +62,7 @@ const CreateEditWorkoutPlan = () => {
     }
   };
 
-  // Initialize dark mode from local storage or system preference
+  // Initialize dark mode from localStorage or system preference
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode !== null) {
@@ -63,7 +81,7 @@ const CreateEditWorkoutPlan = () => {
     }
   }, [darkMode]);
 
-  // Load workout plan data if editing
+  // Load workout plan data if editing (id exists)
   useEffect(() => {
     if (id) {
       const fetchWorkoutPlan = async () => {
@@ -81,12 +99,19 @@ const CreateEditWorkoutPlan = () => {
     }
   }, [id]);
 
+  /**
+   * Toggles between dark and light mode
+   */
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('darkMode', newDarkMode);
   };
 
+  /**
+   * Handles changes to main form inputs
+   * @param {Event} e - Input change event
+   */
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -95,6 +120,10 @@ const CreateEditWorkoutPlan = () => {
     });
   };
 
+  /**
+   * Handles changes to new exercise inputs
+   * @param {Event} e - Input change event
+   */
   const handleExerciseInputChange = (e) => {
     const { name, value } = e.target;
     setNewExercise({
@@ -103,6 +132,10 @@ const CreateEditWorkoutPlan = () => {
     });
   };
 
+  /**
+   * Handles changes to editing exercise inputs
+   * @param {Event} e - Input change event
+   */
   const handleEditingExerciseInputChange = (e) => {
     const { name, value } = e.target;
     setEditingExercise({
@@ -111,6 +144,9 @@ const CreateEditWorkoutPlan = () => {
     });
   };
 
+  /**
+   * Adds a new target muscle to the form
+   */
   const addTargetMuscle = () => {
     const trimmedMuscle = newTargetMuscle.trim();
     if (trimmedMuscle && !formData.targetMuscles.includes(trimmedMuscle) && /^[A-Za-z\s]+$/.test(trimmedMuscle)) {
@@ -122,6 +158,10 @@ const CreateEditWorkoutPlan = () => {
     }
   };
 
+  /**
+   * Removes a target muscle from the form
+   * @param {string} muscle - Muscle to remove
+   */
   const removeTargetMuscle = (muscle) => {
     setFormData({
       ...formData,
@@ -129,6 +169,9 @@ const CreateEditWorkoutPlan = () => {
     });
   };
 
+  /**
+   * Adds a new exercise to the form
+   */
   const addExercise = () => {
     if (newExercise.name.trim() && /^[A-Za-z\s]+$/.test(newExercise.name.trim())) {
       setFormData({
@@ -144,6 +187,10 @@ const CreateEditWorkoutPlan = () => {
     }
   };
 
+  /**
+   * Removes an exercise from the form
+   * @param {number} index - Index of exercise to remove
+   */
   const removeExercise = (index) => {
     const updatedExercises = [...formData.exercises];
     updatedExercises.splice(index, 1);
@@ -156,11 +203,18 @@ const CreateEditWorkoutPlan = () => {
     }
   };
 
+  /**
+   * Starts editing an existing exercise
+   * @param {number} index - Index of exercise to edit
+   */
   const startEditingExercise = (index) => {
     setEditingExerciseIndex(index);
     setEditingExercise({ ...formData.exercises[index] });
   };
 
+  /**
+   * Saves changes to an edited exercise
+   */
   const saveEditedExercise = () => {
     if (editingExercise.name.trim() && /^[A-Za-z\s]+$/.test(editingExercise.name.trim())) {
       const updatedExercises = [...formData.exercises];
@@ -179,6 +233,9 @@ const CreateEditWorkoutPlan = () => {
     }
   };
 
+  /**
+   * Cancels editing an exercise
+   */
   const cancelEditingExercise = () => {
     setEditingExerciseIndex(null);
     setEditingExercise({
@@ -189,6 +246,10 @@ const CreateEditWorkoutPlan = () => {
     });
   };
 
+  /**
+   * Handles form submission for both create and update
+   * @param {Event} e - Form submit event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!/^[A-Za-z\s]+$/.test(formData.title.trim())) {
@@ -210,12 +271,14 @@ const CreateEditWorkoutPlan = () => {
     }
   };
 
+  // Loading state UI
   if (loading) return (
     <div className={`fixed inset-0 flex justify-center items-center ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} bg-opacity-80 z-50`}>
       <div className={`animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 ${darkMode ? 'border-purple-500' : 'border-purple-600'}`}></div>
     </div>
   );
 
+  // Error state UI
   if (error) return (
     <div className={`max-w-3xl mx-auto mt-12 p-6 ${darkMode ? 'bg-red-900/30' : 'bg-red-100'} border-l-4 ${darkMode ? 'border-red-700' : 'border-red-500'} rounded-lg shadow-md ${darkMode ? 'text-red-200' : 'text-red-700'}`}>
       <div className="flex items-center mb-3">
@@ -242,9 +305,11 @@ const CreateEditWorkoutPlan = () => {
     </div>
   );
 
+  // Main component render
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} py-12`}>
       <div className={`max-w-3xl mx-auto px-6 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg`}>
+        {/* Header section */}
         <div className={`pt-10 pb-6 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="flex justify-between items-center">
             <div>
@@ -255,6 +320,7 @@ const CreateEditWorkoutPlan = () => {
                 {id ? 'Update your existing workout plan' : 'Design your perfect fitness journey'}
               </p>
             </div>
+            {/* Dark mode toggle button */}
             <button
               onClick={toggleDarkMode}
               className={`p-2 rounded-md ${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition-colors`}
@@ -273,6 +339,7 @@ const CreateEditWorkoutPlan = () => {
           </div>
         </div>
 
+        {/* Main form */}
         <form onSubmit={handleSubmit} className="py-8 space-y-10">
           {/* Basic Information Section */}
           <section className="space-y-6">
@@ -286,6 +353,7 @@ const CreateEditWorkoutPlan = () => {
             </div>
             
             <div className={`${darkMode ? 'bg-gray-750 border-gray-700' : 'bg-gray-50 border-gray-200'} border rounded-xl p-6 shadow-sm`}>
+              {/* Plan Title */}
               <div className="mb-6">
                 <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Plan Title*</label>
                 <input
@@ -300,6 +368,7 @@ const CreateEditWorkoutPlan = () => {
                 />
               </div>
 
+              {/* Difficulty Level */}
               <div className="mb-6">
                 <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Difficulty Level*</label>
                 <div className="flex flex-wrap gap-4">
@@ -319,6 +388,7 @@ const CreateEditWorkoutPlan = () => {
                 </div>
               </div>
 
+              {/* Duration and other fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Duration (minutes)*</label>
@@ -334,6 +404,7 @@ const CreateEditWorkoutPlan = () => {
                 </div>
               </div>
 
+              {/* Description */}
               <div className="mb-6">
                 <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Description*</label>
                 <textarea
@@ -361,6 +432,7 @@ const CreateEditWorkoutPlan = () => {
             </div>
             
             <div className={`${darkMode ? 'bg-gray-750 border-gray-700' : 'bg-gray-50 border-gray-200'} border rounded-xl p-6 shadow-sm`}>
+              {/* Add Target Muscle Input */}
               <div className="flex mb-4">
                 <input
                   type="text"
@@ -384,6 +456,7 @@ const CreateEditWorkoutPlan = () => {
                 </button>
               </div>
               
+              {/* Display Target Muscles */}
               <div className="flex flex-wrap gap-2">
                 {formData.targetMuscles.map((muscle) => (
                   <span
@@ -393,7 +466,7 @@ const CreateEditWorkoutPlan = () => {
                     {muscle}
                     <button
                       type="button"
-                      onClick={() => removeTargetMuscle(mcule)}
+                      onClick={() => removeTargetMuscle(muscle)}
                       className={`ml-2 ${darkMode ? 'text-green-400 hover:text-green-200' : 'text-green-600 hover:text-green-900'}`}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -417,11 +490,13 @@ const CreateEditWorkoutPlan = () => {
               <h2 className="text-2xl font-semibold">Exercises</h2>
             </div>
             
+            {/* Existing Exercises List */}
             {formData.exercises.length > 0 ? (
               <div className="space-y-4">
                 {formData.exercises.map((exercise, index) => (
                   <div key={index} className={`${darkMode ? 'bg-gray-750 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg p-5 shadow-sm hover:shadow-md transition duration-200`}>
                     {editingExerciseIndex === index ? (
+                      // Edit Exercise Form
                       <div>
                         <h3 className={`font-medium text-lg ${darkMode ? 'text-gray-200' : 'text-gray-800'} mb-4 flex items-center`}>
                           <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} viewBox="0 0 20 20" fill="currentColor">
@@ -501,6 +576,7 @@ const CreateEditWorkoutPlan = () => {
                         </div>
                       </div>
                     ) : (
+                      // Exercise Display
                       <div>
                         <div className="flex justify-between items-center mb-3">
                           <div className="flex items-center">
@@ -550,6 +626,7 @@ const CreateEditWorkoutPlan = () => {
                 ))}
               </div>
             ) : (
+              // Empty State for Exercises
               <div className={`text-center py-8 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'} border border-dashed rounded-lg`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className={`mx-auto h-16 w-16 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905A3.61 3.61 0 008.5 5.5V14M5 18h8.5l4.5 3v-3h1a2 2 0 002-2v-4.5a2 2 0 00-2-2H5a2 2 0 00-2 2V16a2 2 0 002 2z" />
@@ -559,6 +636,7 @@ const CreateEditWorkoutPlan = () => {
               </div>
             )}
 
+            {/* Add New Exercise Form */}
             <div className={`${darkMode ? 'bg-gray-750 border-gray-700' : 'bg-gray-50 border-gray-200'} border rounded-lg p-6 shadow-sm mt-6`}>
               <h3 className={`font-medium text-lg ${darkMode ? 'text-gray-200' : 'text-gray-800'} mb-4 flex items-center`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} viewBox="0 0 20 20" fill="currentColor">
@@ -637,7 +715,7 @@ const CreateEditWorkoutPlan = () => {
             </div>
           </section>
 
-          {/* Submit Button */}
+          {/* Form Submission Section */}
           <div className={`pt-6 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <div className="flex flex-col space-y-3">
               <button

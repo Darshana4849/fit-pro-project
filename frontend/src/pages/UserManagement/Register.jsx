@@ -3,34 +3,51 @@ import React, { useState } from 'react';
 import { Box, TextField, Button, Typography, LinearProgress } from '@mui/material';
 import { registerUser, sendOtp, verifyOtp } from '../../services/authService';
 
+/**
+ * Register component handles user registration with:
+ * - Email verification via OTP
+ * - Password strength validation
+ * - Form validation
+ */
 function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [isVerified, setIsVerified] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [strength, setStrength] = useState(0);
-  const [message, setMessage] = useState('');
+  // State management for form fields and registration flow
+  const [name, setName] = useState(''); // User's name
+  const [email, setEmail] = useState(''); // User's email
+  const [password, setPassword] = useState(''); // User's password
+  const [confirmPassword, setConfirmPassword] = useState(''); // Password confirmation
+  const [otp, setOtp] = useState(''); // One-time password for verification
+  const [isVerified, setIsVerified] = useState(false); // Email verification status
+  const [otpSent, setOtpSent] = useState(false); // OTP sending status
+  const [strength, setStrength] = useState(0); // Password strength score (0-4)
+  const [message, setMessage] = useState(''); // Status/error messages
 
-  // Basic password strength logic
+  /**
+   * Evaluates password strength based on common criteria
+   * @param {string} pass - The password to evaluate
+   * @returns {number} Strength score (0-4)
+   */
   const evaluatePasswordStrength = (pass) => {
     let score = 0;
-    if (pass.length >= 8) score++;
-    if (/[A-Z]/.test(pass)) score++;
-    if (/[0-9]/.test(pass)) score++;
-    if (/[^A-Za-z0-9]/.test(pass)) score++;
+    if (pass.length >= 8) score++; // Minimum length
+    if (/[A-Z]/.test(pass)) score++; // Contains uppercase
+    if (/[0-9]/.test(pass)) score++; // Contains number
+    if (/[^A-Za-z0-9]/.test(pass)) score++; // Contains special char
     return score;
   };
 
+  /**
+   * Handles password changes and updates strength score
+   * @param {Object} e - Change event from password input
+   */
   const handlePasswordChange = (e) => {
     const val = e.target.value;
     setPassword(val);
     setStrength(evaluatePasswordStrength(val));
   };
 
-  // Send OTP endpoint: verifies that email is entered first.
+  /**
+   * Sends OTP to the provided email after validation
+   */
   const handleSendOtp = async () => {
     if (!email) {
       setMessage('Please enter your email before sending OTP.');
@@ -45,7 +62,9 @@ function Register() {
     }
   };
 
-  // Verify OTP endpoint
+  /**
+   * Verifies the entered OTP against the server
+   */
   const handleVerifyOtp = async () => {
     if (otp.length < 6) {
       setMessage('OTP must be at least 6 digits.');
@@ -60,7 +79,9 @@ function Register() {
     }
   };
 
-  // Register endpoint; only allow registration if OTP is verified and passwords match.
+  /**
+   * Handles the final registration submission
+   */
   const handleRegister = async () => {
     if (!isVerified) {
       setMessage('Please verify your email first with the OTP.');
@@ -81,52 +102,62 @@ function Register() {
   return (
     <Box
       sx={{
-        width: 400,
-        margin: 'auto',
-        marginTop: 5,
+        width: 400, // Fixed width form
+        margin: 'auto', // Center horizontally
+        marginTop: 5, // Top margin
         display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
+        flexDirection: 'column', // Vertical layout
+        gap: 2, // Spacing between elements
       }}
     >
+      {/* Form title */}
       <Typography variant="h4" textAlign="center">Register</Typography>
 
+      {/* Name input */}
       <TextField
         label="Name"
         variant="outlined"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
+
+      {/* Email input */}
       <TextField
         label="Email"
         variant="outlined"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
+
+      {/* OTP verification section */}
       <Box display="flex" gap={1}>
+        {/* OTP input */}
         <TextField
           label="OTP"
           variant="outlined"
           value={otp}
           onChange={(e) => setOtp(e.target.value)}
-          disabled={isVerified}
+          disabled={isVerified} // Disable after verification
         />
+        {/* Send OTP button */}
         <Button
           variant="contained"
           onClick={handleSendOtp}
-          disabled={otpSent || isVerified}
+          disabled={otpSent || isVerified} // Disable after sending or verification
         >
           {otpSent ? "OTP Sent" : "Send OTP"}
         </Button>
+        {/* Verify OTP button */}
         <Button
           variant="outlined"
           onClick={handleVerifyOtp}
-          disabled={!otpSent || isVerified}
+          disabled={!otpSent || isVerified} // Disable unless OTP sent and not verified
         >
           Verify OTP
         </Button>
       </Box>
 
+      {/* Password input with strength meter */}
       <TextField
         label="Password"
         type="password"
@@ -134,12 +165,14 @@ function Register() {
         value={password}
         onChange={handlePasswordChange}
       />
+      {/* Password strength indicator */}
       <LinearProgress
         variant="determinate"
-        value={(strength / 4) * 100}
-        sx={{ height: 8 }}
+        value={(strength / 4) * 100} // Convert 0-4 score to percentage
+        sx={{ height: 8 }} // Custom height
       />
 
+      {/* Password confirmation */}
       <TextField
         label="Confirm Password"
         type="password"
@@ -148,10 +181,12 @@ function Register() {
         onChange={(e) => setConfirmPassword(e.target.value)}
       />
 
+      {/* Registration submit button */}
       <Button variant="contained" onClick={handleRegister}>
         Register
       </Button>
 
+      {/* Status/error message display */}
       {message && (
         <Typography color="secondary" textAlign="center">
           {message}

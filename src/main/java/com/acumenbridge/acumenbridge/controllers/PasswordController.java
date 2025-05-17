@@ -11,23 +11,37 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+/**
+ * Password Controller
+ * 
+ * Handles password reset functionality including:
+ * - Generating and sending password reset links
+ * - Validating reset tokens
+ * - Updating user passwords
+ */
 @RestController
-@RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping("/auth") // Base path for authentication-related endpoints
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // Allow frontend requests with credentials
 public class PasswordController {
 
-    @Autowired
+    @Autowired // Injects UserRepository for database operations
     private UserRepository userRepository;
 
-    @Autowired
+    @Autowired // Injects EmailService for sending reset emails
     private EmailService emailService;
 
-    @Autowired
+    @Autowired // Injects PasswordResetService for token management
     private PasswordResetService passwordResetService;
 
+    // Password encoder for securely hashing new passwords
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // Endpoint to request a password reset link
+    /**
+     * Request a password reset link
+     * 
+     * @param request Contains the user's email address
+     * @return ResponseEntity with success/error message
+     */
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody EmailRequest request) {
         String email = request.getEmail();
@@ -35,30 +49,38 @@ public class PasswordController {
         if (!userOpt.isPresent()) {
             return ResponseEntity.badRequest().body("Email not found");
         }
-        // Generate a reset token
+        
+        // Generate a secure reset token
         String token = passwordResetService.createResetToken(email);
-        // Construct the reset link (adjust this URL to point to your React reset password page)
+        
+        // Construct the reset link (frontend URL)
         String resetLink = "http://localhost:5173/reset-password/" + token + "?email=" + email;
+        
         // Send the reset link via email
         emailService.sendPasswordResetEmail(email, resetLink);
+        
         return ResponseEntity.ok("Password reset link sent to your email");
     }
 
-    // Endpoint to reset the password using the provided token and new password.
-    // Note: We now extract all data from the request body instead of the SecurityContext.
+    /**
+     * Reset user password using a valid token
+     * 
+     * @param request Contains email, token, and new password
+     * @return ResponseEntity with success/error message
+     */
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         String email = request.getEmail();
         String token = request.getToken();
         String newPassword = request.getNewPassword();
 
-        // Validate that none of the required fields are missing.
+        // Validate required fields
         if (email == null || token == null || newPassword == null ||
             email.isEmpty() || token.isEmpty() || newPassword.isEmpty()) {
             return ResponseEntity.badRequest().body("Email, token, and new password are required");
         }
 
-        // Validate the token
+        // Validate the reset token
         if (!passwordResetService.validateResetToken(email, token)) {
             return ResponseEntity.badRequest().body("Invalid or expired reset token");
         }
@@ -67,27 +89,33 @@ public class PasswordController {
         if (!userOpt.isPresent()) {
             return ResponseEntity.badRequest().body("User not found");
         }
+        
         User user = userOpt.get();
-        // Update user's password
+        // Update user's password with hashed version
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+        
         // Remove the used reset token
         passwordResetService.removeResetToken(email);
+        
         return ResponseEntity.ok("Password has been reset successfully");
     }
 }
 
-// Helper request classes (you can put these in separate files if you prefer)
-
-
+/**
+ * Request DTO for reset password operation
+ */
 class ResetPasswordRequest {
     private String email;
     private String token;
     private String newPassword;
+    
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }
+    
     public String getNewPassword() { return newPassword; }
     public void setNewPassword(String newPassword) { this.newPassword = newPassword; }
 }

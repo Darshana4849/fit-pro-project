@@ -1,3 +1,4 @@
+// src/components/CommentSection/CommentSection.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Box,
@@ -21,23 +22,34 @@ import {
   deleteComment
 } from '../../services/interactionService';
 
+/**
+ * CommentSection component for displaying and managing comments on a post.
+ * Allows users to view, add, edit, and delete comments.
+ * 
+ * @param {Object} props - Component props
+ * @param {string} props.postId - ID of the post these comments belong to
+ * @param {Object} props.sx - Additional styles to apply to the component
+ * @returns {JSX.Element} The CommentSection component
+ */
 export default function CommentSection({ postId, sx }) {
+  // Context and navigation
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // State for comments and loading
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
   const [posting, setPosting] = useState(false);
 
-  // menu/edit state
+  // State for comment menu and editing
   const [anchorEl, setAnchorEl] = useState(null);
   const [selComment, setSelComment] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [processingId, setProcessingId] = useState(null);
 
-  // load
+  // Load comments when postId changes
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -52,7 +64,7 @@ export default function CommentSection({ postId, sx }) {
     })();
   }, [postId]);
 
-  // new comment
+  // Handle submitting a new comment
   const handleSubmit = async () => {
     if (!text.trim()) return;
     setPosting(true);
@@ -67,7 +79,7 @@ export default function CommentSection({ postId, sx }) {
     }
   };
 
-  // menu open/close
+  // Menu handlers
   const openMenu = (e, comment) => {
     setAnchorEl(e.currentTarget);
     setSelComment(comment);
@@ -77,7 +89,7 @@ export default function CommentSection({ postId, sx }) {
     setSelComment(null);
   };
 
-  // start edit
+  // Edit handlers
   const startEdit = () => {
     setEditingId(selComment.id);
     setEditText(selComment.text);
@@ -88,7 +100,7 @@ export default function CommentSection({ postId, sx }) {
     setEditText('');
   };
 
-  // save edit
+  // Save edited comment
   const saveEdit = async () => {
     setProcessingId(editingId);
     try {
@@ -102,7 +114,7 @@ export default function CommentSection({ postId, sx }) {
     }
   };
 
-  // delete
+  // Delete comment
   const handleDelete = async () => {
     const cid = selComment.id;
     closeMenu();
@@ -118,6 +130,7 @@ export default function CommentSection({ postId, sx }) {
     }
   };
 
+  // Loading state
   if (loading) {
     return <CircularProgress size={24} sx={{ py: 2, color: 'white' }} />;
   }
@@ -130,7 +143,7 @@ export default function CommentSection({ postId, sx }) {
       color: 'white',
       ...sx 
     }}>
-      {/* New comment */}
+      {/* New comment input */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         <TextField
           fullWidth
@@ -169,7 +182,7 @@ export default function CommentSection({ postId, sx }) {
         </IconButton>
       </Box>
 
-      {/* List */}
+      {/* Comments list */}
       {comments.map(c => {
         const isAuthor = user && c.authorId === user.id;
         return (
@@ -266,7 +279,7 @@ export default function CommentSection({ postId, sx }) {
               )}
             </Box>
 
-            {/* three-dot for comment author */}
+            {/* Comment menu button (only for author) */}
             {isAuthor && (
               <IconButton
                 size="small"
@@ -286,7 +299,7 @@ export default function CommentSection({ postId, sx }) {
         );
       })}
 
-      {/* Shared menu */}
+      {/* Comment action menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

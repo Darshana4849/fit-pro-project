@@ -41,39 +41,78 @@ import { AuthContext } from '../../context/AuthContext';
 import { likePost, unlikePost } from '../../services/interactionService';
 import CommentSection from './CommentSection';
 
+/**
+ * PostCard component displays a single post with media, likes, comments, and sharing options.
+ * 
+ * @param {Object} post - The post data to display
+ * @param {Function} onEdit - Callback for edit action
+ * @param {Function} onDelete - Callback for delete action
+ * @param {Boolean} darkMode - Whether dark mode is enabled
+ * @returns {JSX.Element} The rendered post card component
+ */
 export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
+  // Navigation hook for routing
   const navigate = useNavigate();
+  // Authentication context for current user data
   const { user } = useContext(AuthContext);
 
+  // State for dropdown menu anchor
   const [anchorEl, setAnchorEl] = useState(null);
+  // State for share menu anchor
   const [shareAnchorEl, setShareAnchorEl] = useState(null);
+  // State for current media index (for posts with multiple media)
   const [currentIndex, setCurrentIndex] = useState(0);
+  // State for likes count
   const [likesCount, setLikesCount] = useState(post.likes?.length || 0);
+  // State for tracking if current user liked the post
   const [isLiked, setIsLiked] = useState(false);
+  // State for showing/hiding comments section
   const [showComments, setShowComments] = useState(false);
 
+  // Menu open state
   const menuOpen = Boolean(anchorEl);
+  // Share menu open state
   const shareMenuOpen = Boolean(shareAnchorEl);
+  // Function to open dropdown menu
   const openMenu = e => setAnchorEl(e.currentTarget);
+  // Function to close dropdown menu
   const closeMenu = () => setAnchorEl(null);
 
+  /**
+   * Handles click on share button to open share menu
+   * @param {Event} event - The click event
+   */
   const handleShareClick = (event) => {
     setShareAnchorEl(event.currentTarget);
   };
 
+  /**
+   * Handles closing of share menu
+   */
   const handleShareClose = () => {
     setShareAnchorEl(null);
   };
 
+  /**
+   * Handles edit action and closes menu
+   */
   const handleEdit = () => { closeMenu(); onEdit && onEdit(post); };
+  
+  /**
+   * Handles delete action and closes menu
+   */
   const handleDelete = () => { closeMenu(); onDelete && onDelete(post); };
 
+  // Effect to check if current user liked the post
   useEffect(() => {
     if (user && Array.isArray(post.likes)) {
       setIsLiked(post.likes.includes(user.id));
     }
   }, [user, post.likes]);
 
+  /**
+   * Toggles like status for the post
+   */
   const toggleLike = async () => {
     if (!user) return;
     try {
@@ -90,27 +129,48 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
     }
   };
 
+  // Get media URLs from post
   const media = post.mediaUrls || [];
+  // Total media count
   const total = media.length;
+  // Current media URL
   const url = media[currentIndex] || '';
+  // Check if current media is a video
   const isVideo = /\.(mp4|webm)$/i.test(url);
+  // Function to go to previous media
   const goPrev = () => setCurrentIndex(i => Math.max(0, i - 1));
+  // Function to go to next media
   const goNext = () => setCurrentIndex(i => Math.min(total - 1, i + 1));
 
+  /**
+   * Navigates to user's profile page
+   */
   const goToProfile = () => navigate(`/profile/${post.userId}`);
 
+  /**
+   * Constructs full avatar URL
+   * @param {String} avatar - Avatar path or URL
+   * @returns {String} Full avatar URL
+   */
   const getAvatarUrl = (avatar) => {
     if (!avatar) return '';
     if (avatar.startsWith('http')) return avatar;
     return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/uploads/${avatar}`;
   };
 
+  // Post URL for sharing
   const postUrl = `${window.location.origin}/post/${post.id}`;
+  // Post title for sharing
   const postTitle = `${post.userName}'s post`;
+  // Post description for sharing (truncated if needed)
   const postDescription = post.description.length > 100 
     ? `${post.description.substring(0, 100)}...` 
     : post.description;
 
+  /**
+   * Shares post on specified platform
+   * @param {String} platform - Platform to share on
+   */
   const shareOnPlatform = (platform) => {
     let shareUrl = '';
     switch (platform) {
@@ -139,6 +199,9 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
     }
   };
 
+  /**
+   * Copies post URL to clipboard
+   */
   const copyToClipboard = () => {
     navigator.clipboard.writeText(postUrl);
     handleShareClose();
@@ -228,6 +291,7 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
 
   return (
     <Card sx={styles.card}>
+      {/* Post header with user info and actions */}
       <CardHeader
         avatar={
           <Avatar
@@ -278,12 +342,14 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
         sx={styles.cardHeader}
       />
 
+      {/* Post content (description) */}
       <CardContent sx={styles.cardContent}>
         <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>
           {post.description}
         </Typography>
       </CardContent>
 
+      {/* Media section (images/videos) */}
       {total > 0 && (
         <Box sx={styles.mediaContainer}>
           <CardMedia
@@ -298,6 +364,7 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
             }}
           />
 
+          {/* Navigation buttons for multiple media */}
           {total > 1 && (
             <>
               {currentIndex > 0 && (
@@ -321,7 +388,9 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
         </Box>
       )}
 
+      {/* Post actions (like, comment, share) */}
       <CardActions disableSpacing sx={styles.cardActions}>
+        {/* Like button */}
         <Tooltip title={isLiked ? 'Unlike' : 'Like'}>
           <IconButton onClick={toggleLike} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
             <Badge badgeContent={likesCount} color="primary">
@@ -333,6 +402,7 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
           </IconButton>
         </Tooltip>
 
+        {/* Comments button */}
         <Tooltip title="Comments">
           <IconButton 
             onClick={() => setShowComments(s => !s)} 
@@ -344,13 +414,14 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
           </IconButton>
         </Tooltip>
 
+        {/* Share button */}
         <Tooltip title="Share">
           <IconButton onClick={handleShareClick} sx={{ color: darkMode ? 'white' : 'text.primary' }}>
             <ShareIcon />
           </IconButton>
         </Tooltip>
 
-        {/* Share Popover */}
+        {/* Share popover menu */}
         <Popover
           open={shareMenuOpen}
           anchorEl={shareAnchorEl}
@@ -431,7 +502,7 @@ export default function PostCard({ post, onEdit, onDelete, darkMode = false }) {
         </Popover>
       </CardActions>
 
-
+      {/* Comments section (shown when toggled) */}
       {showComments && (
         <CommentSection 
           postId={post.id} 

@@ -1,3 +1,4 @@
+// src/main/java/com/acumenbridge/acumenbridge/repositories/PostRepository.java
 package com.acumenbridge.acumenbridge.repositories;
 
 import com.acumenbridge.acumenbridge.models.Post;

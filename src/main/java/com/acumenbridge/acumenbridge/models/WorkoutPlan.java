@@ -7,35 +7,56 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "workoutPlans")
+/**
+ * WorkoutPlan Model
+ * 
+ * Represents a workout plan entity in the system, containing:
+ * - Workout plan details (title, description, difficulty)
+ * - Duration and target muscles
+ * - List of exercises with their specifications
+ * - Creator information and visibility settings
+ * - Creation and modification timestamps
+ */
+@Document(collection = "workoutPlans") // Specifies the MongoDB collection name
 public class WorkoutPlan {
-    @Id
-    private String id;
+    @Id // Marks this field as the document identifier
+    private String id; // Unique identifier for the workout plan
     
-    private String userId;       // who created the plan
-    private String userName;     // display name of the creator
+    private String userId;       // ID of the user who created the plan
+    private String userName;     // Display name of the creator
     
-    private String title;
-    private String description;
-    private String difficulty;   // Beginner, Intermediate, Advanced
-    private int durationMinutes;
-    private List<String> targetMuscles = new ArrayList<>();
-    private List<Exercise> exercises = new ArrayList<>();
-    private boolean isPublic;
+    private String title;        // Title of the workout plan
+    private String description;  // Description of the workout plan
+    private String difficulty;   // Difficulty level (Beginner, Intermediate, Advanced)
+    private int durationMinutes; // Total duration in minutes
+    private List<String> targetMuscles = new ArrayList<>(); // List of targeted muscle groups
+    private List<Exercise> exercises = new ArrayList<>();   // List of exercises in the plan
+    private boolean isPublic;    // Visibility setting for the plan
     
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Instant createdAt;   // Timestamp when plan was created
+    private Instant updatedAt;   // Timestamp when plan was last updated
 
-    // Nested Exercise class
+    /**
+     * Nested Exercise class representing individual exercises within a workout plan
+     */
     public static class Exercise {
-        private String name;
-        private int sets;
-        private String reps;        // Changed to String to support ranges like "8-12"
-        private String duration;    // Added to support time-based exercises (e.g. "30 sec")
+        private String name;     // Name of the exercise
+        private int sets;        // Number of sets
+        private String reps;     // Repetitions (can be a range like "8-12")
+        private String duration; // Duration for time-based exercises (e.g. "30 sec")
         
-        // Constructors, getters, and setters
+        /**
+         * Default constructor
+         */
         public Exercise() {}
         
+        /**
+         * Constructor for creating a new Exercise with specifications
+         * @param name Name of the exercise
+         * @param sets Number of sets
+         * @param reps Repetitions (can be a range)
+         * @param duration Duration for time-based exercises
+         */
         public Exercise(String name, int sets, String reps, String duration) {
             this.name = name;
             this.sets = sets;
@@ -43,7 +64,7 @@ public class WorkoutPlan {
             this.duration = duration;
         }
 
-        // Getters and setters
+        // Standard getters and setters
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
         
@@ -56,6 +77,10 @@ public class WorkoutPlan {
         public String getDuration() { return duration; }
         public void setDuration(String duration) { this.duration = duration; }
         
+        /**
+         * Returns a string representation of the Exercise
+         * @return String containing exercise details
+         */
         @Override
         public String toString() {
             return "Exercise{" +
@@ -67,13 +92,25 @@ public class WorkoutPlan {
         }
     }
 
-    // Constructors
+    /**
+     * Default constructor initializes timestamps
+     */
     public WorkoutPlan() {
         Instant now = Instant.now();
         this.createdAt = now;
         this.updatedAt = now;
     }
     
+    /**
+     * Convenience constructor for creating a new WorkoutPlan with basic information
+     * @param title Title of the workout plan
+     * @param description Description of the workout plan
+     * @param difficulty Difficulty level
+     * @param durationMinutes Total duration in minutes
+     * @param targetMuscles List of targeted muscle groups
+     * @param exercises List of exercises
+     * @param isPublic Visibility setting
+     */
     public WorkoutPlan(String title, String description, String difficulty, 
                        int durationMinutes, List<String> targetMuscles, 
                        List<Exercise> exercises, boolean isPublic) {
@@ -87,7 +124,10 @@ public class WorkoutPlan {
         this.isPublic = isPublic;
     }
 
-    // Getters and setters
+    // --------------------------------------
+    // Standard Getters and Setters
+    // --------------------------------------
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     
@@ -124,6 +164,10 @@ public class WorkoutPlan {
     public Instant getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
     
+    // --------------------------------------
+    // Business Logic Methods
+    // --------------------------------------
+
     /**
      * Updates the updatedAt timestamp to the current time
      */
@@ -173,6 +217,10 @@ public class WorkoutPlan {
         return null;
     }
     
+    /**
+     * Returns a string representation of the WorkoutPlan
+     * @return String containing workout plan details
+     */
     @Override
     public String toString() {
         return "WorkoutPlan{" +

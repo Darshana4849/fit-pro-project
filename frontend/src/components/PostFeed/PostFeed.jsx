@@ -3,17 +3,31 @@ import { Box, CircularProgress, Typography, Button } from '@mui/material';
 import { getFeed, getPostsByUser } from '../../services/postService';
 import PostCard from '../Post/PostCard';
 
+/**
+ * PostFeed component displays a feed of posts, either for a specific user or the global feed.
+ * 
+ * @param {String} userId - Optional user ID to filter posts by a specific user
+ * @param {Number} limit - Optional limit to restrict the number of posts displayed
+ * @param {Function} onEdit - Callback for when a post is edited
+ * @param {Function} onDelete - Callback for when a post is deleted
+ * @param {Boolean} darkMode - Whether dark mode is enabled
+ * @returns {JSX.Element} The rendered post feed component
+ */
 export default function PostFeed({ userId, limit, onEdit, onDelete, darkMode = false }) {
+  // State for storing the list of posts
   const [posts, setPosts] = useState([]);
+  // State for tracking loading status
   const [loading, setLoading] = useState(true);
 
+  // Effect to load posts when component mounts or userId changes
   useEffect(() => {
     async function load() {
       setLoading(true);
       try {
+        // Fetch posts based on whether userId is provided
         const res = userId
-          ? await getPostsByUser(userId)
-          : await getFeed();
+          ? await getPostsByUser(userId)  // User-specific posts
+          : await getFeed();             // Global feed
         setPosts(res.data);
       } catch (err) {
         console.error('Error loading posts:', err);
@@ -24,6 +38,7 @@ export default function PostFeed({ userId, limit, onEdit, onDelete, darkMode = f
     load();
   }, [userId]);
 
+  // Apply limit to posts if specified
   const displayPosts = typeof limit === 'number'
     ? posts.slice(0, limit)
     : posts;
@@ -75,7 +90,7 @@ export default function PostFeed({ userId, limit, onEdit, onDelete, darkMode = f
 
   return (
     <Box sx={styles.container}>
-      {/* Optional Refresh button */}
+      {/* Optional Refresh button (currently commented out) */}
       {!userId && (
         <Box sx={styles.refreshBar}>
           {/* <Button 
@@ -89,9 +104,10 @@ export default function PostFeed({ userId, limit, onEdit, onDelete, darkMode = f
         </Box>
       )}
 
-      {/* Scrollable feed */}
+      {/* Scrollable feed container */}
       <Box sx={styles.scrollContainer}>
         {loading ? (
+          // Loading indicator
           <Box sx={{ 
             textAlign: 'center', 
             mt: 0.5 
@@ -102,6 +118,7 @@ export default function PostFeed({ userId, limit, onEdit, onDelete, darkMode = f
             />
           </Box>
         ) : displayPosts.length === 0 ? (
+          // Empty state message
           <Typography 
             align="center" 
             sx={styles.emptyText}
@@ -109,6 +126,7 @@ export default function PostFeed({ userId, limit, onEdit, onDelete, darkMode = f
             No posts yet.
           </Typography>
         ) : (
+          // Render the list of posts using PostCard component
           displayPosts.map(post => (
             <PostCard
               key={post.id}

@@ -10,23 +10,30 @@ import {
   Button,
 } from '@mui/material';
 import { getUserProfileById, followUser, unfollowUser } from '../../services/connectionService';
-
 import PostFeed from '../../components/PostFeed/PostFeed';
 import { AuthContext } from '../../context/AuthContext';
 
+/**
+ * UserProfilePage component displays a user's profile including:
+ * - Profile information (avatar, name, email)
+ * - Follow/unfollow functionality (for other users)
+ * - The user's post feed
+ */
 export default function UserProfilePage() {
+  // Get the user ID from URL parameters
   const { id } = useParams();
+  // Get the current authenticated user from context
   const { user: currentUser } = useContext(AuthContext);
 
-  const [viewedUser, setViewedUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
+  // State management:
+  const [viewedUser, setViewedUser] = useState(null); // The user whose profile is being viewed
+  const [loadingUser, setLoadingUser] = useState(true); // Loading state for user data
+  const [isFollowing, setIsFollowing] = useState(false); // Follow status of current user
+  const [followLoading, setFollowLoading] = useState(false); // Loading state for follow actions
 
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followLoading, setFollowLoading] = useState(false);
-
-  // load the profile we're viewing
+  // Load the profile data when component mounts or ID changes
   useEffect(() => {
-    let mounted = true;
+    let mounted = true; // Flag to prevent state updates after unmount
     (async () => {
       try {
         const res = await getUserProfileById(id);
@@ -38,21 +45,25 @@ export default function UserProfilePage() {
         if (mounted) setLoadingUser(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => { mounted = false; }; // Cleanup function
   }, [id]);
 
-  // once we know both currentUser and viewedUser, check follow state
+  // Check follow status when both currentUser and viewedUser are available
   useEffect(() => {
     if (loadingUser || !currentUser || !viewedUser) return;
     setIsFollowing(viewedUser.followers?.includes(currentUser.id));
   }, [loadingUser, currentUser, viewedUser]);
 
+  /**
+   * Handles following a user
+   */
   const handleFollow = async () => {
     if (!viewedUser) return;
     setFollowLoading(true);
     try {
       await followUser(viewedUser.id);
       setIsFollowing(true);
+      // Update the viewedUser's followers list optimistically
       setViewedUser(u => ({
         ...u,
         followers: [...(u.followers||[]), currentUser.id]
@@ -64,12 +75,16 @@ export default function UserProfilePage() {
     }
   };
 
+  /**
+   * Handles unfollowing a user
+   */
   const handleUnfollow = async () => {
     if (!viewedUser) return;
     setFollowLoading(true);
     try {
       await unfollowUser(viewedUser.id);
       setIsFollowing(false);
+      // Update the viewedUser's followers list optimistically
       setViewedUser(u => ({
         ...u,
         followers: (u.followers||[]).filter(fid => fid !== currentUser.id)
@@ -81,6 +96,7 @@ export default function UserProfilePage() {
     }
   };
 
+  // Loading state UI
   if (loadingUser) {
     return (
       <Box sx={{ textAlign: 'center', mt: 4 }}>
@@ -89,6 +105,7 @@ export default function UserProfilePage() {
     );
   }
 
+  // Error state UI (user not found)
   if (!viewedUser) {
     return (
       <Container sx={{ mt: 4, textAlign: 'center' }}>
@@ -97,25 +114,29 @@ export default function UserProfilePage() {
     );
   }
 
+  // Check if this is the current user's own profile
   const isOwnProfile = currentUser?.id === viewedUser.id;
 
   return (
     <Container sx={{ mt: 4, mb: 6 }}>
-      {/* PROFILE HEADER */}
+      {/* PROFILE HEADER SECTION */}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        {/* User avatar */}
         <Avatar
           src={viewedUser.avatar}
           alt={viewedUser.name}
           sx={{ width: 120, height: 120 }}
         />
+        
+        {/* User name and email */}
         <Typography variant="h4">{viewedUser.name}</Typography>
         <Typography variant="body1" color="text.secondary">{viewedUser.email}</Typography>
 
-        {/* follow/unfollow */}
+        {/* Follow/Unfollow button (only shown for other users) */}
         {!isOwnProfile && (
           <Box sx={{ mt: 1 }}>
             {followLoading
-              ? <CircularProgress size={24} />
+              ? <CircularProgress size={24} /> // Loading state
               : isFollowing
                 ? <Button variant="outlined" onClick={handleUnfollow}>Unfollow</Button>
                 : <Button variant="contained" onClick={handleFollow}>Follow</Button>
@@ -124,16 +145,17 @@ export default function UserProfilePage() {
         )}
       </Box>
 
-      {/* POSTS FEED */}
+      {/* USER'S POSTS SECTION */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h5" gutterBottom>
           {isOwnProfile ? 'Your Posts' : `${viewedUser.name}’s Posts`}
         </Typography>
-        {/* show all; you can pass limit={...} if you want */}
+        
+        {/* Post feed component */}
         <PostFeed
           userId={viewedUser.id}
-          onEdit={isOwnProfile ? post => console.log('edit', post) : null}
-          onDelete={isOwnProfile ? post => console.log('delete', post) : null}
+          onEdit={isOwnProfile ? post => console.log('edit', post) : null} // Edit callback for own posts
+          onDelete={isOwnProfile ? post => console.log('delete', post) : null} // Delete callback for own posts
         />
       </Box>
     </Container>

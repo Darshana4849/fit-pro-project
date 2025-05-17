@@ -15,15 +15,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Connection Controller
+ * 
+ * Handles all user connection-related operations including:
+ * - Following/unfollowing users
+ * - Retrieving followed users
+ * - Getting user suggestions
+ * - Managing follower/following relationships
+ */
 @RestController
-@RequestMapping(value = "/auth", produces = "application/json")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping(value = "/auth", produces = "application/json") // Base path for authentication-related endpoints
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // Allow frontend requests with credentials
 public class ConnectionController {
 
-    @Autowired
+    @Autowired // Injects UserRepository for database operations
     private UserRepository userRepository;
 
-    // Helper method to extract the logged-in user's email
+    /**
+     * Helper method to extract the logged-in user's email from security context
+     * Supports multiple authentication types:
+     * - JWT tokens
+     * - OAuth2 authentication
+     * - Standard UserDetails
+     * 
+     * @return Email of the authenticated user or principal string if unknown type
+     */
     private String getLoggedInUserEmail() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof Jwt) {
@@ -36,7 +53,11 @@ public class ConnectionController {
         return principal.toString();
     }
 
-    // GET /auth/following: Returns the list of user objects the current user is following
+    /**
+     * Get the list of users the current user is following
+     * 
+     * @return ResponseEntity with list of followed users or error message
+     */
     @GetMapping("/following")
     public ResponseEntity<?> getFollowing() {
         String email = getLoggedInUserEmail();
@@ -46,7 +67,7 @@ public class ConnectionController {
         }
         User currentUser = optUser.get();
         List<String> followingIds = currentUser.getFollowing();
-        // If following list is null, return an empty list
+        // Handle null following list
         if (followingIds == null) {
             followingIds = new ArrayList<>();
         }
@@ -54,7 +75,11 @@ public class ConnectionController {
         return ResponseEntity.ok(followingUsers);
     }
 
-    // GET /auth/suggestions: Returns a list of suggested users to follow (users not already followed)
+    /**
+     * Get suggested users to follow (users not already followed)
+     * 
+     * @return ResponseEntity with list of suggested users or error message
+     */
     @GetMapping("/suggestions")
     public ResponseEntity<?> getSuggestions() {
         String email = getLoggedInUserEmail();
@@ -63,11 +88,15 @@ public class ConnectionController {
             return ResponseEntity.badRequest().body("User not found");
         }
         User currentUser = optUser.get();
+        
+        // Users to exclude from suggestions (self + already followed)
         List<String> excludeIds = new ArrayList<>();
         excludeIds.add(currentUser.getId());
         if (currentUser.getFollowing() != null) {
             excludeIds.addAll(currentUser.getFollowing());
         }
+        
+        // Get all users and filter out excluded ones
         List<User> allUsers = userRepository.findAll();
         List<User> suggestions = allUsers.stream()
                 .filter(u -> !excludeIds.contains(u.getId()))
@@ -75,7 +104,12 @@ public class ConnectionController {
         return ResponseEntity.ok(suggestions);
     }
 
-    // POST /auth/follow/{targetUserId}: Follow a user
+    /**
+     * Follow a user
+     * 
+     * @param targetUserId ID of the user to follow
+     * @return ResponseEntity with success message or error
+     */
     @PostMapping("/follow/{targetUserId}")
     public ResponseEntity<?> followUser(@PathVariable String targetUserId) {
         String email = getLoggedInUserEmail();
@@ -89,6 +123,7 @@ public class ConnectionController {
         User currentUser = optCurrent.get();
         User targetUser = optTarget.get();
 
+        // Initialize lists if null
         if (currentUser.getFollowing() == null) {
             currentUser.setFollowing(new ArrayList<>());
         }
@@ -96,6 +131,7 @@ public class ConnectionController {
             targetUser.setFollowers(new ArrayList<>());
         }
 
+        // Add follow relationship if not already exists
         if (!currentUser.getFollowing().contains(targetUserId)) {
             currentUser.getFollowing().add(targetUserId);
         }
@@ -108,7 +144,12 @@ public class ConnectionController {
         return ResponseEntity.ok("Followed user: " + targetUser.getName());
     }
 
-    // POST /auth/unfollow/{targetUserId}: Unfollow a user
+    /**
+     * Unfollow a user
+     * 
+     * @param targetUserId ID of the user to unfollow
+     * @return ResponseEntity with success message or error
+     */
     @PostMapping("/unfollow/{targetUserId}")
     public ResponseEntity<?> unfollowUser(@PathVariable String targetUserId) {
         String email = getLoggedInUserEmail();
@@ -122,6 +163,7 @@ public class ConnectionController {
         User currentUser = optCurrent.get();
         User targetUser = optTarget.get();
 
+        // Remove follow relationship if exists
         if (currentUser.getFollowing() != null) {
             currentUser.getFollowing().remove(targetUserId);
         }
@@ -134,7 +176,11 @@ public class ConnectionController {
         return ResponseEntity.ok("Unfollowed user: " + targetUser.getName());
     }
 
-    // (Optional) GET /auth/connections: Return both followers and following lists
+    /**
+     * Get both followers and following lists for the current user
+     * 
+     * @return ResponseEntity with ConnectionsResponse containing both lists
+     */
     @GetMapping("/connections")
     public ResponseEntity<?> getConnections() {
         String email = getLoggedInUserEmail();
@@ -146,7 +192,10 @@ public class ConnectionController {
         return ResponseEntity.ok(new ConnectionsResponse(currentUser.getFollowers(), currentUser.getFollowing()));
     }
 
-    // Inner static class with getters and setters for Jackson serialization
+    /**
+     * Inner class for connections response
+     * Used for JSON serialization of both followers and following lists
+     */
     public static class ConnectionsResponse {
         private List<String> followers;
         private List<String> following;

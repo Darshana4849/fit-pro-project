@@ -1,13 +1,23 @@
+// src/services/postService.js
 import axios from 'axios';
 
+// Set API URL from environment variables or default to local development server
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// helper to include auth header if logged in
+/**
+ * Helper function to generate authorization headers with JWT token if available
+ * @returns {Object} Headers object with Authorization if token exists, empty object otherwise
+ */
 function authHeaders() {
   const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+/**
+ * Create a new post
+ * @param {Object|FormData} postData - The post data to create (can be FormData for file uploads)
+ * @returns {Promise} Axios response with the created post
+ */
 export async function createPost(postData) {
   // postData can be FormData (if you ever attach files)
   return axios.post(
@@ -24,6 +34,10 @@ export async function createPost(postData) {
   );
 }
 
+/**
+ * Get the current user's feed of posts
+ * @returns {Promise} Axios response with array of post objects
+ */
 export async function getFeed() {
   return axios.get(
     `${API_URL}/posts`,
@@ -34,6 +48,11 @@ export async function getFeed() {
   );
 }
 
+/**
+ * Get all posts by a specific user
+ * @param {string} userId - The ID of the user whose posts to fetch
+ * @returns {Promise} Axios response with array of post objects
+ */
 export async function getPostsByUser(userId) {
   return axios.get(
     `${API_URL}/posts/user/${userId}`,
@@ -44,6 +63,11 @@ export async function getPostsByUser(userId) {
   );
 }
 
+/**
+ * Get a specific post by its ID
+ * @param {string} postId - The ID of the post to fetch
+ * @returns {Promise} Axios response with the post object
+ */
 export async function getPostById(postId) {
   return axios.get(
     `${API_URL}/posts/${postId}`,
@@ -54,6 +78,12 @@ export async function getPostById(postId) {
   );
 }
 
+/**
+ * Update an existing post
+ * @param {string} postId - The ID of the post to update
+ * @param {Object} updateData - The data to update the post with
+ * @returns {Promise} Axios response with the updated post
+ */
 export async function updatePost(postId, updateData) {
   return axios.put(
     `${API_URL}/posts/${postId}`,
@@ -68,6 +98,11 @@ export async function updatePost(postId, updateData) {
   );
 }
 
+/**
+ * Delete a post
+ * @param {string} postId - The ID of the post to delete
+ * @returns {Promise} Axios response
+ */
 export async function deletePost(postId) {
   return axios.delete(
     `${API_URL}/posts/${postId}`,

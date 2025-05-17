@@ -1,3 +1,4 @@
+// src/main/java/com/acumenbridge/acumenbridge/services/EmailService.java
 package com.acumenbridge.acumenbridge.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +9,21 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+/**
+ * Service class for handling email operations including OTP and password reset emails.
+ * Uses Spring's JavaMailSender for sending emails with both HTML and plain text content.
+ */
 @Service
 public class EmailService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private JavaMailSender mailSender; // Injected mail sender for email operations
 
+    /**
+     * Sends an HTML formatted email containing an OTP (One-Time Password) code.
+     * @param to The recipient's email address
+     * @param otp The OTP code to be sent
+     */
     public void sendOtpEmail(String to, String otp) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -40,13 +50,18 @@ public class EmailService {
                     "</div>" +
                   "</body></html>";
 
-            helper.setText(content, true);
+            helper.setText(content, true); // Set HTML content
             mailSender.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Log any email sending errors
         }
     }
 
+    /**
+     * Sends a plain text password reset email with a reset link.
+     * @param to The recipient's email address
+     * @param resetLink The password reset URL/link
+     */
     public void sendPasswordResetEmail(String to, String resetLink) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

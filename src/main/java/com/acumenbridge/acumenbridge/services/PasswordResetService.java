@@ -1,3 +1,4 @@
+// src/main/java/com/acumenbridge/acumenbridge/services/PasswordResetService.java
 package com.acumenbridge.acumenbridge.services;
 
 import org.springframework.stereotype.Service;
@@ -5,6 +6,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service for handling password reset token generation and validation.
+ * Provides secure token management for password reset functionality.
+ */
 @Service
 public class PasswordResetService {
 
@@ -15,15 +20,28 @@ public class PasswordResetService {
         private final String token;
         private final long expiry;
 
+        /**
+         * Constructs a new ResetTokenInfo instance.
+         * @param token The reset token
+         * @param expiry The expiry timestamp in milliseconds
+         */
         public ResetTokenInfo(String token, long expiry) {
             this.token = token;
             this.expiry = expiry;
         }
 
+        /**
+         * Gets the reset token.
+         * @return The reset token string
+         */
         public String getToken() {
             return token;
         }
 
+        /**
+         * Gets the token expiry time.
+         * @return The expiry timestamp in milliseconds
+         */
         public long getExpiry() {
             return expiry;
         }
