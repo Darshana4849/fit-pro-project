@@ -3,15 +3,22 @@ import { useParams, Link } from 'react-router-dom';
 import { getWorkoutPlanById } from '../../services/workoutPlanService';
 
 const WorkoutPlanDetail = () => {
+  // Get the workout plan ID from URL parameters
   const { id } = useParams();
+  
+  // State for storing the workout plan data
   const [workoutPlan, setWorkoutPlan] = useState(null);
+  // State for loading status
   const [loading, setLoading] = useState(true);
+  // State for error handling
   const [error, setError] = useState(null);
 
+  // Fetch workout plan data when component mounts or ID changes
   useEffect(() => {
     const fetchWorkoutPlan = async () => {
       try {
         setLoading(true);
+        // Call service to get workout plan by ID
         const plan = await getWorkoutPlanById(id);
         setWorkoutPlan(plan);
       } catch (err) {
@@ -24,6 +31,7 @@ const WorkoutPlanDetail = () => {
     fetchWorkoutPlan();
   }, [id]);
 
+  // Helper function to get SVG icon based on workout type
   const getWorkoutTypeIcon = (type) => {
     switch (type?.toLowerCase()) {
       case 'strength':
@@ -53,6 +61,7 @@ const WorkoutPlanDetail = () => {
     }
   };
 
+  // Helper function to get Tailwind classes based on difficulty level
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case 'Beginner':
@@ -66,12 +75,14 @@ const WorkoutPlanDetail = () => {
     }
   };
 
+  // Loading state UI
   if (loading) return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
   );
 
+  // Error state UI
   if (error) return (
     <div className="max-w-3xl mx-auto mt-8 p-4 bg-red-50 border-l-4 border-red-500">
       <p className="text-red-700">Error: {error}</p>
@@ -84,10 +95,13 @@ const WorkoutPlanDetail = () => {
     </div>
   );
 
+  // Return null if no workout plan data is available
   if (!workoutPlan) return null;
 
+  // Main component render
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      {/* Header section with back button and action buttons */}
       <div className="mb-6 flex justify-between items-center">
         <div className="flex items-center">
           <Link to="/workout-plans" className="text-blue-600 hover:text-blue-800">
@@ -98,6 +112,7 @@ const WorkoutPlanDetail = () => {
           </Link>
         </div>
         <div className="flex space-x-4">
+          {/* Edit button */}
           <Link
             to={`/workout-plans/${id}/edit`}
             className="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50 flex items-center"
@@ -108,6 +123,7 @@ const WorkoutPlanDetail = () => {
             Edit
           </Link>
           
+          {/* Start workout button */}
           <Link
             to={`/workout-plans/${id}/execute`}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
@@ -120,20 +136,25 @@ const WorkoutPlanDetail = () => {
         </div>
       </div>
 
+      {/* Main workout plan details card */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
+        {/* Plan header with title and metadata */}
         <div className="px-6 py-5 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
             <h1 className="text-2xl font-bold text-gray-900">{workoutPlan.title}</h1>
             <div className="mt-2 sm:mt-0 flex items-center space-x-2">
+              {/* Difficulty badge */}
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(workoutPlan.difficulty)}`}>
                 {workoutPlan.difficulty}
               </span>
+              {/* Duration badge */}
               <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {workoutPlan.durationMinutes} mins
               </span>
+              {/* Workout type badge */}
               <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium flex items-center">
                 {getWorkoutTypeIcon(workoutPlan.workoutType)} 
                 <span className="ml-1">{workoutPlan.workoutType || 'Strength'}</span>
@@ -142,11 +163,13 @@ const WorkoutPlanDetail = () => {
           </div>
         </div>
 
+        {/* Plan description and target muscles */}
         <div className="px-6 py-4">
           <p className="text-gray-700">
             {workoutPlan.description || 'No description available.'}
           </p>
           
+          {/* Target muscles section */}
           {workoutPlan.targetMuscles && workoutPlan.targetMuscles.length > 0 && (
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-900 mb-2">Target Muscles:</h3>
@@ -164,26 +187,32 @@ const WorkoutPlanDetail = () => {
           )}
         </div>
 
+        {/* Exercises section */}
         <div className="px-6 py-4 border-t border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Exercises:</h2>
           
           <div className="space-y-6">
+            {/* Check if there are exercises */}
             {workoutPlan.exercises && workoutPlan.exercises.length > 0 ? (
+              // Map through exercises
               workoutPlan.exercises.map((exercise, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">{exercise.name}</h3>
                   <div className="flex items-center justify-between text-gray-700">
                     <div className="flex items-center">
+                      {/* Display sets if available */}
                       {exercise.sets && (
                         <span className="mr-4">
                           <span className="font-medium">{exercise.sets}</span> sets
                         </span>
                       )}
+                      {/* Display reps if available */}
                       {exercise.reps && (
                         <span className="mr-4">
                           <span className="font-medium">{exercise.reps}</span> reps
                         </span>
                       )}
+                      {/* Display duration if available */}
                       {exercise.duration && (
                         <span>
                           <span className="font-medium">{exercise.duration}</span>
@@ -194,6 +223,7 @@ const WorkoutPlanDetail = () => {
                 </div>
               ))
             ) : (
+              // Empty state for no exercises
               <div className="text-center py-8 text-gray-500">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
