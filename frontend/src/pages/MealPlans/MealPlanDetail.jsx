@@ -88,7 +88,7 @@ const MealPlanDetail = () => {
                 <h3 className="font-medium text-lg text-purple-800">
                   {meal.timeOfDay}: {meal.name}
                 </h3>
-                
+                <p className="text-sm text-purple-600">{meal.calories} calories</p>
               </div>
               
               <div className="p-4">
