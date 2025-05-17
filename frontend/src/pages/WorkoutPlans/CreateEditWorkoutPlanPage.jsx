@@ -36,7 +36,7 @@ const CreateEditWorkoutPlan = () => {
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
 
-  // Validation function for letters and spaces only
+  // Validation function for letters and spaces only in this section
   const allowOnlyLetters = (e) => {
     const regex = /^[A-Za-z\s]*$/;
     if (!regex.test(e.key)) {
