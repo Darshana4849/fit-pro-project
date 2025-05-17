@@ -224,7 +224,7 @@ const WorkoutPlanForm = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Information Section */}
+          {/* Basic Information Section update */}
           <div className={`${darkMode ? 'bg-blue-900/20' : 'bg-blue-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-blue-300' : 'text-blue-800'} mb-4`}>Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
