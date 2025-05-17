@@ -23,15 +23,15 @@ import java.util.Optional;
  * Supports cross-origin requests from the frontend development server.
  */
 @RestController
-@RequestMapping("/posts")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping("/posts") // Base path for all post endpoints
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // Allow frontend requests with credentials
 public class PostController {
 
-    @Autowired
-    private PostRepository postRepository; // Repository for post data operations
+    @Autowired // Repository for post data operations
+    private PostRepository postRepository;
 
-    @Autowired
-    private UserRepository userRepository; // Repository for user data operations
+    @Autowired // Repository for user data operations
+    private UserRepository userRepository;
 
     /**
      * Helper method to extract the current user's email from the security context.
@@ -41,15 +41,15 @@ public class PostController {
      */
     private String getLoggedInUserEmail() {
         Object principal = SecurityContextHolder.getContext()
-                                                .getAuthentication()
-                                                .getPrincipal();
+                                              .getAuthentication()
+                                              .getPrincipal();
 
         if (principal instanceof Jwt) {
             return ((Jwt) principal).getSubject();
         } else if (principal instanceof DefaultOAuth2User) {
             return (String) ((DefaultOAuth2User) principal)
-                                 .getAttributes()
-                                 .get("email");
+                               .getAttributes()
+                               .get("email");
         } else if (principal instanceof UserDetails) {
             return ((UserDetails) principal).getUsername();
         } else {
@@ -81,6 +81,7 @@ public class PostController {
         }
         User currentUser = optUser.get();
 
+        // Set post metadata
         Instant now = Instant.now();
         post.setUserId(currentUser.getId());
         post.setUserName(currentUser.getName());
@@ -105,7 +106,7 @@ public class PostController {
         }
         User currentUser = optUser.get();
 
-        // build list of IDs: themselves + whoever they follow
+        // Build list of IDs: themselves + whoever they follow
         List<String> userIds = new ArrayList<>(currentUser.getFollowing());
         userIds.add(currentUser.getId());
 
@@ -135,7 +136,7 @@ public class PostController {
     public ResponseEntity<?> getPostById(@PathVariable String id) {
         Optional<Post> opt = postRepository.findById(id);
         return opt.map(ResponseEntity::ok)
-                  .orElseGet(() -> ResponseEntity.notFound().build());
+                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -161,10 +162,13 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
         Post existing = optPost.get();
+        
+        // Verify current user is the post owner
         if (!existing.getUserId().equals(currentUserId)) {
             return ResponseEntity.status(403).body("Forbidden");
         }
 
+        // Update post fields
         existing.setDescription(updates.getDescription());
         existing.setMediaUrls(updates.getMediaUrls());
         existing.setUpdatedAt(Instant.now());
@@ -192,6 +196,8 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
         Post existing = optPost.get();
+        
+        // Verify current user is the post owner
         if (!existing.getUserId().equals(currentUserId)) {
             return ResponseEntity.status(403).body("Forbidden");
         }
