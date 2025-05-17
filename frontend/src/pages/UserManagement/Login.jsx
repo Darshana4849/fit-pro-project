@@ -10,59 +10,79 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { loginUser, socialLogin } from '../../services/authService';
 
-// Logo Imports
+// Logo Imports for social login buttons
 import GoogleLogo from '../../assets/google-logo.svg';
 import FacebookLogo from '../../assets/facebook-logo.svg';
 import GitHubLogo from '../../assets/github-logo.svg';
 
+/**
+ * Login component handles user authentication through:
+ * - Email/password login
+ * - Social login (Google, Facebook, GitHub)
+ * - Navigation to registration and password recovery
+ */
 function Login() {
+  // React Router navigation hook
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
+  
+  // State management:
+  const [email, setEmail] = useState(''); // Stores email input
+  const [password, setPassword] = useState(''); // Stores password input
+  const [message, setMessage] = useState(''); // Stores authentication messages
+  const [loading, setLoading] = useState(false); // Loading state during authentication
 
+  /**
+   * Handles traditional email/password login
+   */
   const handleLogin = async () => {
     setLoading(true);
     setMessage('');
     try {
       await loginUser({ email, password });
-      navigate('/');
+      navigate('/'); // Redirect to home on successful login
     } catch (err) {
+      // Display error message from API or default message
       setMessage(err.response?.data?.message || 'Login failed');
       setLoading(false);
     }
   };
 
+  /**
+   * Handles social login redirection
+   * @param {string} provider - Social login provider (google, facebook, github)
+   */
   const handleSocialLogin = (provider) => {
     socialLogin(provider);
   };
 
   return (
+    // Outer container with dark background
     <Box
       sx={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#000000',
-        p: 2
+        minHeight: '100vh', // Full viewport height
+        backgroundColor: '#000000', // Black background
+        p: 2 // Padding
       }}
     >
+      {/* Login form container */}
       <Box
         sx={{
           width: '100%',
-          maxWidth: '400px',
+          maxWidth: '400px', // Responsive max width
           padding: '2rem',
           borderRadius: '8px',
-          boxShadow: '0 2px 20px rgba(0,0,0,0.5)',
+          boxShadow: '0 2px 20px rgba(0,0,0,0.5)', // Subtle shadow
           display: 'flex',
           flexDirection: 'column',
-          gap: 2,
-          backgroundColor: '#121212',
-          border: '1px solid rgba(255, 255, 255, 0.1)'
+          gap: 2, // Spacing between child elements
+          backgroundColor: '#121212', // Dark background
+          border: '1px solid rgba(255, 255, 255, 0.1)' // Subtle border
         }}
       >
+        {/* Form header */}
         <Typography variant="h4" textAlign="center" fontWeight="bold" mb={1} color="white">
           Welcome Back!
         </Typography>
@@ -70,6 +90,7 @@ function Login() {
           Please log in to continue
         </Typography>
 
+        {/* Email input field */}
         <TextField
           label="Email"
           variant="outlined"
@@ -79,23 +100,25 @@ function Login() {
           sx={{
             '& .MuiOutlinedInput-root': {
               '& fieldset': {
-                borderColor: 'rgba(255, 255, 255, 0.23)',
+                borderColor: 'rgba(255, 255, 255, 0.23)', // Light border
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(255, 255, 255, 0.5)',
+                borderColor: 'rgba(255, 255, 255, 0.5)', // Hover state
               },
               '&.Mui-focused fieldset': {
-                borderColor: 'primary.main',
+                borderColor: 'primary.main', // Focus state
               },
             },
             '& .MuiInputLabel-root': {
-              color: 'rgba(255, 255, 255, 0.7)',
+              color: 'rgba(255, 255, 255, 0.7)', // Label color
             },
             '& .MuiInputBase-input': {
-              color: 'white',
+              color: 'white', // Input text color
             },
           }}
         />
+
+        {/* Password input field */}
         <TextField
           label="Password"
           type="password"
@@ -124,29 +147,32 @@ function Login() {
           }}
         />
 
+        {/* Login button */}
         <Button
           variant="contained"
           onClick={handleLogin}
           sx={{ 
-            textTransform: 'none', 
+            textTransform: 'none', // Prevent uppercase transformation
             fontWeight: 'bold',
-            py: 1.5,
+            py: 1.5, // Vertical padding
             '&:hover': {
-              backgroundColor: 'primary.dark'
+              backgroundColor: 'primary.dark' // Darker hover state
             }
           }}
           fullWidth
-          disabled={loading}
+          disabled={loading} // Disable during loading
         >
           {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
         </Button>
 
+        {/* Error/success message display */}
         {message && (
           <Typography color="error" textAlign="center" mt={1}>
             {message}
           </Typography>
         )}
 
+        {/* Secondary actions (Forgot password/Register) */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
           <Button
             variant="text"
@@ -170,16 +196,18 @@ function Login() {
           </Button>
         </Box>
 
+        {/* Divider with "OR" text */}
         <Divider sx={{ 
-          my: 2,
-          color: 'rgba(255, 255, 255, 0.5)',
+          my: 2, // Margin vertical
+          color: 'rgba(255, 255, 255, 0.5)', // Text color
           '&::before, &::after': {
-            borderColor: 'rgba(255, 255, 255, 0.12)',
+            borderColor: 'rgba(255, 255, 255, 0.12)', // Divider line color
           }
         }}>
           OR
         </Divider>
 
+        {/* Social login buttons */}
         <Button
           variant="outlined"
           onClick={() => handleSocialLogin('google')}
@@ -187,14 +215,14 @@ function Login() {
             <img src={GoogleLogo} alt="Google" style={{ width: 24, height: 24 }} />
           }
           sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)', // Slightly opaque background
             color: 'white',
             borderColor: 'rgba(255, 255, 255, 0.23)',
             textTransform: 'none',
             fontWeight: 'bold',
             py: 1.5,
             '&:hover': { 
-              backgroundColor: 'rgba(255, 255, 255, 0.12)',
+              backgroundColor: 'rgba(255, 255, 255, 0.12)', // Hover state
               borderColor: 'rgba(255, 255, 255, 0.5)'
             },
           }}
