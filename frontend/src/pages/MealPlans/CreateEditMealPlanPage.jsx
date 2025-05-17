@@ -6,9 +6,16 @@ import {
   updateMealPlan 
 } from '../../services/mealPlanService';
 
+/**
+ * CreateEditMealPlan component - Handles creating and editing meal plans
+ * @returns {JSX.Element} The meal plan form component
+ */
 const CreateEditMealPlan = () => {
+  // Router hooks
   const { id } = useParams();
   const navigate = useNavigate();
+  
+  // Form state
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -17,6 +24,8 @@ const CreateEditMealPlan = () => {
     meals: [],
     isPublic: false,
   });
+  
+  // New meal state
   const [newMeal, setNewMeal] = useState({
     name: '',
     description: '',
@@ -25,16 +34,23 @@ const CreateEditMealPlan = () => {
     preparation: '',
     calories: 500,
   });
+  
+  // New ingredient state
   const [newIngredient, setNewIngredient] = useState({
     name: '',
     amount: '',
     notes: ''
   });
+  
+  // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [editingMealIndex, setEditingMealIndex] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  /**
+   * Effect hook to fetch meal plan data when editing
+   */
   useEffect(() => {
     if (id) {
       const fetchMealPlan = async () => {
@@ -51,8 +67,11 @@ const CreateEditMealPlan = () => {
       fetchMealPlan();
     }
   }, [id]);
-  //const handelinputchange added
 
+  /**
+   * Handles changes to the main form inputs
+   * @param {Event} e - The input change event
+   */
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -61,6 +80,10 @@ const CreateEditMealPlan = () => {
     });
   };
 
+  /**
+   * Handles changes to meal inputs
+   * @param {Event} e - The input change event
+   */
   const handleMealInputChange = (e) => {
     const { name, value } = e.target;
     setNewMeal({
@@ -69,6 +92,10 @@ const CreateEditMealPlan = () => {
     });
   };
 
+  /**
+   * Handles changes to ingredient inputs
+   * @param {Event} e - The input change event
+   */
   const handleIngredientInputChange = (e) => {
     const { name, value } = e.target;
     setNewIngredient({
@@ -77,6 +104,9 @@ const CreateEditMealPlan = () => {
     });
   };
 
+  /**
+   * Adds a new ingredient to the current meal
+   */
   const addIngredient = () => {
     if (newIngredient.name.trim() && newIngredient.amount.trim()) {
       setNewMeal({
@@ -90,7 +120,11 @@ const CreateEditMealPlan = () => {
       });
     }
   };
-//update remove ingredient
+
+  /**
+   * Removes an ingredient from the current meal
+   * @param {number} index - Index of ingredient to remove
+   */
   const removeIngredient = (index) => {
     const updatedIngredients = [...newMeal.ingredients];
     updatedIngredients.splice(index, 1);
@@ -100,6 +134,9 @@ const CreateEditMealPlan = () => {
     });
   };
 
+  /**
+   * Adds or updates a meal in the meal plan
+   */
   const addMeal = () => {
     if (newMeal.name.trim() && newMeal.ingredients.length > 0) {
       if (isEditing && editingMealIndex !== null) {
@@ -132,6 +169,10 @@ const CreateEditMealPlan = () => {
     }
   };
 
+  /**
+   * Starts editing an existing meal
+   * @param {number} index - Index of meal to edit
+   */
   const startEditingMeal = (index) => {
     setNewMeal({...formData.meals[index]});
     setEditingMealIndex(index);
@@ -140,6 +181,9 @@ const CreateEditMealPlan = () => {
     document.querySelector('#meal-form').scrollIntoView({ behavior: 'smooth' });
   };
 
+  /**
+   * Cancels the current meal editing session
+   */
   const cancelEditingMeal = () => {
     setNewMeal({
       name: '',
@@ -153,6 +197,10 @@ const CreateEditMealPlan = () => {
     setEditingMealIndex(null);
   };
 
+  /**
+   * Removes a meal from the meal plan
+   * @param {number} index - Index of meal to remove
+   */
   const removeMeal = (index) => {
     const updatedMeals = [...formData.meals];
     updatedMeals.splice(index, 1);
@@ -170,6 +218,10 @@ const CreateEditMealPlan = () => {
     }
   };
 
+  /**
+   * Handles form submission
+   * @param {Event} e - Form submit event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -187,12 +239,14 @@ const CreateEditMealPlan = () => {
     }
   };
 
+  // Loading state UI
   if (loading) return (
     <div className="flex justify-center items-center min-h-screen bg-gray-900">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-400"></div>
     </div>
   );
 
+  // Error state UI
   if (error) return (
     <div className="bg-red-900 border-l-4 border-red-500 text-red-100 p-4 mx-auto max-w-3xl mt-8">
       <p>Error: {error}</p>
@@ -205,6 +259,7 @@ const CreateEditMealPlan = () => {
     </div>
   );
 
+  // Main component UI
   return (
     <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 text-gray-100">
       <div className="max-w-4xl mx-auto bg-gray-800 rounded-xl shadow-md overflow-hidden p-6">
@@ -269,25 +324,6 @@ const CreateEditMealPlan = () => {
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 />
               </div>
-
-              {/* <div className="flex items-center justify-start pt-6">
-                <div className="flex items-center h-5">
-                  <input
-                    type="checkbox"
-                    name="isPublic"
-                    id="isPublic"
-                    checked={formData.isPublic}
-                    onChange={handleInputChange}
-                    className="h-5 w-5 text-indigo-600 bg-gray-700 border-gray-500 rounded focus:ring-indigo-500"
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="isPublic" className="font-medium text-gray-300">
-                    Make this plan public
-                  </label>
-                  <p className="text-gray-400">Others can view and use this plan</p>
-                </div>
-              </div> */}
             </div>
 
             <div className="mt-4">
