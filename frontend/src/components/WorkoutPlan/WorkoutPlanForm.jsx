@@ -308,7 +308,7 @@ const WorkoutPlanForm = () => {
             <div className="flex flex-wrap gap-2">
               {formData.targetMuscles.map((muscle) => (
                 <span
-                  key={muscle}
+                  key={muscle} //update key features
                   className={`inline-flex items-center px-3 py-1 ${darkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800'} rounded-full text-sm font-medium`}
                 >
                   {muscle}
