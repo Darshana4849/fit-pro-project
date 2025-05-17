@@ -1,10 +1,20 @@
+// src/components/MealPlanForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getMealPlanById, createMealPlan, updateMealPlan } from '../../services/mealPlanService';
 
+/**
+ * MealPlanForm component for creating and editing meal plans.
+ * Handles form state, validation, and submission for meal plans.
+ * 
+ * @returns {JSX.Element} The MealPlanForm component
+ */
 const MealPlanForm = () => {
+  // Get route parameters and navigation function
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // Main form state
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -14,6 +24,7 @@ const MealPlanForm = () => {
     isPublic: false,
   });
 
+  // State for new meal being added
   //const updated
   const [newMeal, setNewMeal] = useState({
     name: '',
@@ -23,14 +34,19 @@ const MealPlanForm = () => {
     preparation: '',
     calories: 500,
   });
+
+  // State for new ingredient being added
   const [newIngredient, setNewIngredient] = useState({
     name: '',
     amount: '',
     notes: ''
   });
+
+  // Loading and error states
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Fetch meal plan data if editing an existing plan
   useEffect(() => {
     if (id) {
       const fetchMealPlan = async () => {
@@ -93,6 +109,7 @@ const MealPlanForm = () => {
     }
   };
 
+  // Generic input change handler for main form
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -101,6 +118,7 @@ const MealPlanForm = () => {
     });
   };
 
+  // Meal input change handler (excluding name which is handled separately)
   const handleMealInputChange = (e) => {
     const { name, value } = e.target;
     
@@ -115,6 +133,7 @@ const MealPlanForm = () => {
     });
   };
 
+  // Ingredient input change handler (excluding name which is handled separately)
   const handleIngredientInputChange = (e) => {
     const { name, value } = e.target;
     
@@ -129,6 +148,7 @@ const MealPlanForm = () => {
     });
   };
 
+  // Add a new ingredient to the current meal
   const addIngredient = () => {
     if (newIngredient.name.trim()) {
       setNewMeal({
@@ -143,6 +163,7 @@ const MealPlanForm = () => {
     }
   };
 
+  // Remove an ingredient from the current meal
   const removeIngredient = (index) => {
     const updatedIngredients = [...newMeal.ingredients];
     updatedIngredients.splice(index, 1);
@@ -152,6 +173,7 @@ const MealPlanForm = () => {
     });
   };
 
+  // Add a new meal to the meal plan
   const addMeal = () => {
     if (newMeal.name.trim()) {
       setFormData({
@@ -169,6 +191,7 @@ const MealPlanForm = () => {
     }
   };
 
+  // Remove a meal from the meal plan
   const removeMeal = (index) => {
     const updatedMeals = [...formData.meals];
     updatedMeals.splice(index, 1);
@@ -178,6 +201,7 @@ const MealPlanForm = () => {
     });
   };
 
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -195,12 +219,14 @@ const MealPlanForm = () => {
     }
   };
 
+  // Loading state UI
   if (loading) return (
     <div className="flex justify-center items-center min-h-screen bg-gray-900">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-400"></div>
     </div>
   );
 
+  // Error state UI
   if (error) return (
     <div className="bg-red-900 border-l-4 border-red-500 text-red-100 p-4 mx-auto max-w-3xl mt-8">
       <p>Error: {error}</p>
@@ -213,6 +239,7 @@ const MealPlanForm = () => {
     </div>
   );
 
+  // Main form UI
   return (
     <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 text-gray-100">
       <div className="max-w-4xl mx-auto bg-gray-800 rounded-xl shadow-md overflow-hidden p-6">
