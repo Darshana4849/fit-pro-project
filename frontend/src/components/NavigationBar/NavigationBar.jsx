@@ -33,7 +33,12 @@ import { useNotifications } from "../../context/NotificationContext";
 import { AuthContext } from "../../context/AuthContext";
 import LogoImage from "../../assets/logo.png";
 
+/**
+ * NavigationBar component that provides the main app navigation.
+ * Includes logo, search, navigation links, notifications, and user menu.
+ */
 export default function NavigationBar() {
+  // Navigation and context hooks
   const navigate = useNavigate();
   const { user, setUser } = useContext(AuthContext);
   const { 
@@ -43,10 +48,12 @@ export default function NavigationBar() {
     markAllAsRead 
   } = useNotifications();
   
+  // State for menu anchors and search
   const [anchorEl, setAnchorEl] = useState(null);
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Notification menu handlers
   const handleNotifMenuOpen = (event) => {
     setNotifAnchorEl(event.currentTarget);
   };
@@ -55,6 +62,7 @@ export default function NavigationBar() {
     setNotifAnchorEl(null);
   };
 
+  // Handle notification click and navigation
   const handleNotificationClick = (notification) => {
     markAsRead(notification.id);
     handleNotifMenuClose();
@@ -72,6 +80,7 @@ export default function NavigationBar() {
     }
   };
 
+  // User menu handlers
   const handleUserMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -80,6 +89,7 @@ export default function NavigationBar() {
     setAnchorEl(null);
   };
 
+  // User menu actions
   const handleViewProfile = () => {
     handleUserMenuClose();
     navigate('/profile');
@@ -96,10 +106,12 @@ export default function NavigationBar() {
     navigate('/login');
   };
 
+  // Logo click handler
   const handleLogoClick = () => {
     navigate('/');
   };
 
+  // Search handlers
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -110,6 +122,7 @@ export default function NavigationBar() {
     }
   };
 
+  // Helper functions for notifications
   const getNotificationIcon = (type) => {
     switch(type) {
       case 'like': return <FavoriteIcon color="error" />;
@@ -141,6 +154,7 @@ export default function NavigationBar() {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
       }}
     >
+      {/* Main toolbar */}
       <Toolbar sx={{ 
         justifyContent: 'space-between', 
         maxWidth: 1280, 
@@ -148,10 +162,12 @@ export default function NavigationBar() {
         width: '100%',
         py: 1
       }}>
+        {/* Logo section */}
         <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={handleLogoClick}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white' }}>FitPro</Typography>
         </Box>
 
+        {/* Search bar */}
         <Box sx={{ flexGrow: 1, maxWidth: 400, mx: 2 }}>
           <TextField
             fullWidth
@@ -199,6 +215,7 @@ export default function NavigationBar() {
           />
         </Box>
 
+        {/* Navigation buttons and user controls */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {user ? (
             <>
