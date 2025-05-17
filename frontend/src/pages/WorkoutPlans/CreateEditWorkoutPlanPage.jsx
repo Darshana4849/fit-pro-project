@@ -64,7 +64,7 @@ const CreateEditWorkoutPlan = () => {
     }
   }, [darkMode]);
 
-  // Load workout plan data if editing
+  // Load workout plan data if editing 
   useEffect(() => {
     if (id) {
       const fetchWorkoutPlan = async () => {
@@ -122,7 +122,7 @@ const CreateEditWorkoutPlan = () => {
       setNewTargetMuscle('');
     }
   };
-
+// remove target muscles
   const removeTargetMuscle = (muscle) => {
     setFormData({
       ...formData,
