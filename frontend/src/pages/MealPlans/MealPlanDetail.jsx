@@ -93,7 +93,7 @@ const MealPlanDetail = () => {
               
               <div className="p-4">
                 {meal.description && (
-                  
+                  <p className="text-gray-600 mb-4">{meal.description}</p>
                 )}
 
                 {meal.ingredients.length > 0 && (
