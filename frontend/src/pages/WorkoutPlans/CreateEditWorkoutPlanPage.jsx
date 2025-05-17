@@ -18,7 +18,7 @@ const CreateEditWorkoutPlan = () => {
     exercises: [],
     isPublic: false,
   });
-  const [newTargetMuscle, setNewTargetMuscle] = useState('');
+  const [newTargetMuscle, setNewTargetMuscle] = useState(''); //update use state
   const [newExercise, setNewExercise] = useState({
     name: '',
     sets: 3,
@@ -36,7 +36,7 @@ const CreateEditWorkoutPlan = () => {
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
 
-  // Validation function for letters and spaces only
+  // Validation function for letters and spaces only in this section
   const allowOnlyLetters = (e) => {
     const regex = /^[A-Za-z\s]*$/;
     if (!regex.test(e.key)) {
@@ -44,7 +44,8 @@ const CreateEditWorkoutPlan = () => {
     }
   };
 
-  // Initialize dark mode from local storage or system preference
+  // Initialize dark mode and light mode
+  // from local storage or system preference
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode !== null) {
@@ -55,7 +56,7 @@ const CreateEditWorkoutPlan = () => {
       localStorage.setItem('darkMode', prefersDark);
     }
     
-    // Apply dark mode class to body
+    // Apply dark mode class to body section
     if (darkMode) {
       document.body.classList.add('dark-mode');
     } else {
@@ -63,7 +64,7 @@ const CreateEditWorkoutPlan = () => {
     }
   }, [darkMode]);
 
-  // Load workout plan data if editing
+  // Load workout plan data if editing 
   useEffect(() => {
     if (id) {
       const fetchWorkoutPlan = async () => {
@@ -121,7 +122,7 @@ const CreateEditWorkoutPlan = () => {
       setNewTargetMuscle('');
     }
   };
-
+// remove target muscles
   const removeTargetMuscle = (muscle) => {
     setFormData({
       ...formData,
