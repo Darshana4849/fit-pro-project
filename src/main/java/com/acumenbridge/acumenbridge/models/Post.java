@@ -64,6 +64,7 @@ public class Post {
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -71,6 +72,7 @@ public class Post {
     public String getUserId() {
         return userId;
     }
+
     public void setUserId(String userId) {
         this.userId = userId;
     }
@@ -78,6 +80,7 @@ public class Post {
     public String getUserName() {
         return userName;
     }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -85,6 +88,7 @@ public class Post {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -92,6 +96,7 @@ public class Post {
     public List<String> getMediaUrls() {
         return mediaUrls;
     }
+
     public void setMediaUrls(List<String> mediaUrls) {
         this.mediaUrls = mediaUrls;
     }
@@ -99,6 +104,7 @@ public class Post {
     public Set<String> getLikes() {
         return likes;
     }
+
     public void setLikes(Set<String> likes) {
         this.likes = likes;
     }
@@ -106,6 +112,7 @@ public class Post {
     public Instant getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
@@ -113,6 +120,7 @@ public class Post {
     public Instant getUpdatedAt() {
         return updatedAt;
     }
+
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
