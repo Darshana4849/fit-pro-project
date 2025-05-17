@@ -6,31 +6,43 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
-@Document(collection = "comments")
+/**
+ * Comment Model
+ * 
+ * Represents a comment entity in the system, storing information about:
+ * - The post being commented on
+ * - The user who made the comment
+ * - The comment text content
+ * - Creation and modification timestamps
+ */
+@Document(collection = "comments") // Specifies the MongoDB collection name
 public class Comment {
 
-    @Id
-    private String id;
+    @Id // Marks this field as the document identifier
+    private String id; // Unique identifier for the comment
 
-    private String postId;
-    private String authorId;
-    private String authorName;
-    private String text;
+    private String postId;     // ID of the post this comment belongs to
+    private String authorId;   // ID of the user who created the comment
+    private String authorName; // Display name of the comment author
+    private String text;       // The comment content
 
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Instant createdAt; // Timestamp when comment was created
+    private Instant updatedAt; // Timestamp when comment was last updated
 
+    /**
+     * Default constructor required by Spring Data.
+     */
     public Comment() {
         // Default constructor for Spring Data
     }
 
     /**
-     * Convenience constructor for creating a new Comment.
+     * Convenience constructor for creating a new Comment with initial values.
      *
      * @param postId      ID of the post being commented on
      * @param authorId    ID of the user making the comment
-     * @param authorName  Display name of the commenter
-     * @param text        The comment text
+     * @param authorName  Display name of the comment author
+     * @param text        The comment text content
      */
     public Comment(String postId, String authorId, String authorName, String text) {
         this.postId     = postId;
@@ -42,7 +54,9 @@ public class Comment {
         this.updatedAt = now;
     }
 
-    // Getters and Setters
+    // --------------------------------------
+    // Standard Getters and Setters
+    // --------------------------------------
 
     public String getId() {
         return id;
@@ -100,6 +114,15 @@ public class Comment {
         this.updatedAt = updatedAt;
     }
 
+    // --------------------------------------
+    // Overridden Methods
+    // --------------------------------------
+
+    /**
+     * Returns a string representation of the Comment object.
+     * 
+     * @return String containing all fields of the Comment
+     */
     @Override
     public String toString() {
         return "Comment{" +
