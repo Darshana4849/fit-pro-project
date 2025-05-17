@@ -44,7 +44,8 @@ const CreateEditWorkoutPlan = () => {
     }
   };
 
-  // Initialize dark mode and light mode from local storage or system preference
+  // Initialize dark mode and light mode
+  // from local storage or system preference
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode !== null) {
