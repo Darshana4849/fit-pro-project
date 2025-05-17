@@ -326,7 +326,7 @@ const WorkoutPlanForm = () => {
             </div>
           </div>
 
-          {/* Exercises Section */}
+          {/* Exercises Section edit */}
           <div className={`${darkMode ? 'bg-purple-900/20' : 'bg-purple-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-purple-300' : 'text-purple-800'} mb-6`}>Exercises</h2>
             
