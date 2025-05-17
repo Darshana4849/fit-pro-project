@@ -18,7 +18,7 @@ const CreateEditWorkoutPlan = () => {
     exercises: [],
     isPublic: false,
   });
-  const [newTargetMuscle, setNewTargetMuscle] = useState('');
+  const [newTargetMuscle, setNewTargetMuscle] = useState(''); //update use state
   const [newExercise, setNewExercise] = useState({
     name: '',
     sets: 3,
