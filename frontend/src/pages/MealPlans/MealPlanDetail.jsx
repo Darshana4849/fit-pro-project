@@ -112,8 +112,7 @@ const MealPlanDetail = () => {
 
                 {meal.preparation && (
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Preparation</h4>
-                    <p className="text-gray-600 whitespace-pre-line">{meal.preparation}</p>
+                    
                   </div>
                 )}
               </div>
