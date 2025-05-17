@@ -2,9 +2,16 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getWorkoutPlanById, createWorkoutPlan, updateWorkoutPlan } from '../../services/workoutPlanService';
 
+/**
+ * WorkoutPlanForm component for creating or editing workout plans
+ * @returns {JSX.Element} The workout plan form component
+ */
 const WorkoutPlanForm = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  // Router hooks
+  const { id } = useParams(); // Get workout plan ID from URL if editing
+  const navigate = useNavigate(); // Navigation function
+
+  // Form state
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -14,12 +21,17 @@ const WorkoutPlanForm = () => {
     exercises: [],
     isPublic: false,
   });
-  const [newTargetMuscle, setNewTargetMuscle] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false);
 
-  // Validation functions
+  // Component state
+  const [newTargetMuscle, setNewTargetMuscle] = useState(''); // Input for new target muscle
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(null); // Error state
+  const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true' || false); // Dark mode state
+
+  /**
+   * Validation function to allow only letters and spaces in input
+   * @param {Event} e - Keyboard event
+   */
   const allowOnlyLetters = (e) => {
     const regex = /^[A-Za-z\s]*$/;
     if (!regex.test(e.key)) {
@@ -27,6 +39,10 @@ const WorkoutPlanForm = () => {
     }
   };
 
+  /**
+   * Validation function to allow only numbers in input
+   * @param {Event} e - Keyboard event
+   */
   const allowOnlyNumbers = (e) => {
     const regex = /^[0-9]*$/;
     if (!regex.test(e.key)) {
@@ -34,6 +50,10 @@ const WorkoutPlanForm = () => {
     }
   };
 
+  /**
+   * Validation function to allow numbers and hyphens in input
+   * @param {Event} e - Keyboard event
+   */
   const allowNumbersAndHyphen = (e) => {
     const regex = /^[0-9-]*$/;
     if (!regex.test(e.key)) {
@@ -41,7 +61,10 @@ const WorkoutPlanForm = () => {
     }
   };
 
-  // Handle key press for target muscle input
+  /**
+   * Handles key press for target muscle input
+   * @param {Event} e - Keyboard event
+   */
   const handleTargetMuscleKeyPress = (e) => {
     allowOnlyLetters(e);
     if (e.key === 'Enter') {
@@ -86,12 +109,19 @@ const WorkoutPlanForm = () => {
     }
   }, [id]);
 
+  /**
+   * Toggles dark mode state
+   */
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     localStorage.setItem('darkMode', newDarkMode);
   };
 
+  /**
+   * Handles input changes for form fields
+   * @param {Event} e - Input change event
+   */
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -100,6 +130,12 @@ const WorkoutPlanForm = () => {
     });
   };
 
+  /**
+   * Handles changes to exercise fields
+   * @param {number} index - Exercise index
+   * @param {string} field - Field name to update
+   * @param {string|number} value - New value
+   */
   const handleExerciseChange = (index, field, value) => {
     const updatedExercises = [...formData.exercises];
     updatedExercises[index] = {
@@ -108,10 +144,13 @@ const WorkoutPlanForm = () => {
     };
     setFormData({
       ...formData,
-      exercises: updatedExercises, //update workouut plan exercises
+      exercises: updatedExercises,
     });
   };
 
+  /**
+   * Adds a new target muscle to the form
+   */
   const addTargetMuscle = () => {
     const regex = /^[A-Za-z\s]+$/;
     if (newTargetMuscle.trim() && regex.test(newTargetMuscle) && !formData.targetMuscles.includes(newTargetMuscle)) {
@@ -123,6 +162,10 @@ const WorkoutPlanForm = () => {
     }
   };
 
+  /**
+   * Removes a target muscle from the form
+   * @param {string} muscle - Muscle to remove
+   */
   const removeTargetMuscle = (muscle) => {
     setFormData({
       ...formData,
@@ -130,6 +173,9 @@ const WorkoutPlanForm = () => {
     });
   };
 
+  /**
+   * Adds a new empty exercise to the form
+   */
   const addExercise = () => {
     setFormData({
       ...formData,
@@ -144,8 +190,12 @@ const WorkoutPlanForm = () => {
       ],
     });
   };
-//remove exercises in form
-  const removeExercise = (indexั้น) => {
+
+  /**
+   * Removes an exercise from the form
+   * @param {number} index - Index of exercise to remove
+   */
+  const removeExercise = (index) => {
     const updatedExercises = [...formData.exercises];
     updatedExercises.splice(index, 1);
     setFormData({
@@ -154,6 +204,10 @@ const WorkoutPlanForm = () => {
     });
   };
 
+  /**
+   * Handles form submission
+   * @param {Event} e - Form submit event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -170,13 +224,15 @@ const WorkoutPlanForm = () => {
       setLoading(false);
     }
   };
-//justify items
+
+  // Loading state UI
   if (loading) return (
     <div className={`flex justify-center items-center min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${darkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
     </div>
   );
 
+  // Error state UI
   if (error) return (
     <div className={`bg-${darkMode ? 'red-900/30' : 'red-100'} border-l-4 border-${darkMode ? 'red-700' : 'red-500'} text-${darkMode ? 'red-400' : 'red-700'} p-4 mx-auto max-w-3xl mt-8`}>
       <p>Error: {error}</p>
@@ -189,14 +245,17 @@ const WorkoutPlanForm = () => {
     </div>
   );
 
+  // Main form UI
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50'} py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200`}>
       <div className={`max-w-4xl mx-auto ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-md overflow-hidden p-6`}>
+        {/* Header section */}
         <div className="flex justify-between items-center mb-8">
           <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
             {id ? 'Edit Workout Plan' : 'Create New Workout Plan'}
           </h1>
           <div className="flex space-x-2">
+            {/* Dark mode toggle button */}
             <button
               onClick={toggleDarkMode}
               className={`p-2 rounded-md ${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition-colors`}
@@ -212,6 +271,7 @@ const WorkoutPlanForm = () => {
                 </svg>
               )}
             </button>
+            {/* Close button */}
             <button
               onClick={() => navigate('/workout-plans')}
               className={`p-2 rounded-md ${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} transition-colors`}
@@ -223,11 +283,13 @@ const WorkoutPlanForm = () => {
           </div>
         </div>
 
+        {/* Main form */}
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Information Section update */}
+          {/* Basic Information Section */}
           <div className={`${darkMode ? 'bg-blue-900/20' : 'bg-blue-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-blue-300' : 'text-blue-800'} mb-4`}>Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Title input */}
               <div>
                 <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Title</label>
                 <input
@@ -241,6 +303,7 @@ const WorkoutPlanForm = () => {
                 />
               </div>
               
+              {/* Difficulty select */}
               <div>
                 <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Difficulty</label>
                 <select
@@ -256,6 +319,7 @@ const WorkoutPlanForm = () => {
                 </select>
               </div>
 
+              {/* Duration input */}
               <div>
                 <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Duration (weeks)*</label>
                 <input
@@ -270,6 +334,7 @@ const WorkoutPlanForm = () => {
               </div>
             </div>
 
+            {/* Description textarea */}
             <div className="mt-4">
               <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Description</label>
               <textarea
@@ -283,9 +348,10 @@ const WorkoutPlanForm = () => {
             </div>
           </div>
 
-          {/* Target Muscles Section update */}
+          {/* Target Muscles Section */}
           <div className={`${darkMode ? 'bg-green-900/20' : 'bg-green-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-green-300' : 'text-green-800'} mb-4`}>Target Muscles</h2>
+            {/* Add muscle input */}
             <div className="flex mb-4">
               <input
                 type="text"
@@ -297,7 +363,7 @@ const WorkoutPlanForm = () => {
               />
               <button
                 type="button"
-                onClick={addTargetMuscle} //add target muscles
+                onClick={addTargetMuscle}
                 className={`px-4 py-2 ${darkMode ? 'bg-green-700 hover:bg-green-800' : 'bg-green-500 hover:bg-green-600'} text-white rounded-r-lg transition-colors`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -305,10 +371,11 @@ const WorkoutPlanForm = () => {
                 </svg>
               </button>
             </div>
+            {/* Muscle tags */}
             <div className="flex flex-wrap gap-2">
               {formData.targetMuscles.map((muscle) => (
                 <span
-                  key={muscle} //update key features
+                  key={muscle}
                   className={`inline-flex items-center px-3 py-1 ${darkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800'} rounded-full text-sm font-medium`}
                 >
                   {muscle}
@@ -326,17 +393,19 @@ const WorkoutPlanForm = () => {
             </div>
           </div>
 
-          {/* Exercises Section edit */}
+          {/* Exercises Section */}
           <div className={`${darkMode ? 'bg-purple-900/20' : 'bg-purple-50'} p-6 rounded-lg`}>
             <h2 className={`text-xl font-semibold ${darkMode ? 'text-purple-300' : 'text-purple-800'} mb-6`}>Exercises</h2>
             
             <div className="space-y-8">
+              {/* Exercise list or empty state */}
               {formData.exercises.length > 0 ? (
                 formData.exercises.map((exercise, index) => (
                   <div 
                     key={index} 
                     className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg p-6 shadow-sm relative`}
                   >
+                    {/* Remove exercise button */}
                     <button
                       type="button"
                       onClick={() => removeExercise(index)}
@@ -347,8 +416,10 @@ const WorkoutPlanForm = () => {
                     </svg>
                     </button>
                     
+                    {/* Exercise header */}
                     <h3 className={`font-semibold text-lg mb-4 ${darkMode ? 'text-gray-200' : ''}`}>Exercise {index + 1}</h3>
                     
+                    {/* Exercise form fields */}
                     <div className="space-y-4">
                       <div>
                         <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Exercise Name*</label>
@@ -412,6 +483,7 @@ const WorkoutPlanForm = () => {
                 </div>
               )}
               
+              {/* Add exercise button */}
               <button
                 type="button"
                 onClick={addExercise}
@@ -429,6 +501,7 @@ const WorkoutPlanForm = () => {
             </div>
           </div>
 
+          {/* Form actions */}
           <div className={`flex justify-end space-x-4 pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
             <button
               type="button"
@@ -458,7 +531,7 @@ const WorkoutPlanForm = () => {
   );
 };
 
-// Add this CSS to your global styles or component this form
+// Dark mode styles
 const darkModeStyles = `
   body.dark-mode {
     background-color: #111827;
@@ -466,6 +539,7 @@ const darkModeStyles = `
   }
 `;
 
+// Inject dark mode styles
 const styleEl = document.createElement('style');
 styleEl.textContent = darkModeStyles;
 document.head.appendChild(styleEl);
