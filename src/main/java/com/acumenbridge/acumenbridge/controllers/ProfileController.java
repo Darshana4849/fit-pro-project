@@ -19,22 +19,36 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+/**
+ * Profile Controller
+ * 
+ * Handles user profile-related operations including:
+ * - Retrieving profile information
+ * - Updating profile details
+ * - Managing profile pictures and banners
+ * - Deleting user accounts
+ */
 @RestController
-@RequestMapping(value = "/auth", produces = "application/json")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping(value = "/auth", produces = "application/json") // Base path for authentication endpoints
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // Allow frontend requests with credentials
 public class ProfileController {
 
-    @Autowired
+    @Autowired // Injects UserRepository for database operations
     private UserRepository userRepository;
     
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // For password hashing
 
-    // Endpoint for current user's profile (requires authentication)
+    /**
+     * Get the current authenticated user's profile
+     * 
+     * @return ResponseEntity with user profile or error message
+     */
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = null;
 
+        // Extract email based on authentication type
         if (principal instanceof Jwt) {
             email = ((Jwt) principal).getSubject();
         } else if (principal instanceof DefaultOAuth2User) {
@@ -51,7 +65,7 @@ public class ProfileController {
         if (userOpt.isPresent()) {
             return ResponseEntity.ok(userOpt.get());
         } else {
-            // For social logins without full profile data, create a new user record.
+            // For social logins without full profile data, create a new user record
             if (principal instanceof DefaultOAuth2User) {
                 User newUser = new User();
                 newUser.setEmail(email);
@@ -64,7 +78,12 @@ public class ProfileController {
         }
     }
 
-    // New endpoint to fetch any user's profile by ID (publicly viewable)
+    /**
+     * Get any user's profile by ID (publicly accessible)
+     * 
+     * @param id The user ID to look up
+     * @return ResponseEntity with user profile or not found error
+     */
     @GetMapping("/profile/{id}")
     public ResponseEntity<?> getProfileById(@PathVariable("id") String id) {
         Optional<User> userOpt = userRepository.findById(id);
@@ -75,7 +94,16 @@ public class ProfileController {
         }
     }
 
-    // Endpoint to update the profile for the logged-in user
+    /**
+     * Update the current user's profile information
+     * 
+     * @param name Updated name
+     * @param oldPassword Current password for verification (required when changing password)
+     * @param newPassword New password (optional)
+     * @param avatar New avatar image file (optional)
+     * @param banner New banner image file (optional)
+     * @return ResponseEntity with updated user profile or error message
+     */
     @PutMapping("/update-profile")
     public ResponseEntity<?> updateProfile(
             @RequestParam("name") String name,
@@ -84,7 +112,7 @@ public class ProfileController {
             @RequestParam(value = "avatar", required = false) MultipartFile avatar,
             @RequestParam(value = "banner", required = false) MultipartFile banner) {
 
-        // Retrieve authenticated user's email
+        // Get authenticated user's email
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = null;
         if (principal instanceof Jwt) {
@@ -105,7 +133,7 @@ public class ProfileController {
         User user = userOpt.get();
         user.setName(name);
 
-        // If a new password is provided, verify the old password first
+        // Handle password change if new password provided
         if (newPassword != null && !newPassword.isEmpty()) {
             if (oldPassword == null || oldPassword.isEmpty() || !passwordEncoder.matches(oldPassword, user.getPassword())) {
                 return ResponseEntity.badRequest().body("Old password is incorrect");
@@ -113,14 +141,14 @@ public class ProfileController {
             user.setPassword(passwordEncoder.encode(newPassword));
         }
 
-        // Handle avatar file upload
+        // Handle avatar upload
         if (avatar != null && !avatar.isEmpty()) {
             try {
                 String avatarFileName = "avatar_" + user.getId() + "_" + avatar.getOriginalFilename();
                 Path avatarPath = Paths.get("uploads/avatars/" + avatarFileName);
                 Files.createDirectories(avatarPath.getParent());
                 Files.write(avatarPath, avatar.getBytes());
-                // Update user's avatar URL (adjust the URL based on your hosting configuration)
+                // Update avatar URL (adjust based on your hosting configuration)
                 user.setAvatar("http://localhost:8080/uploads/avatars/" + avatarFileName);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -128,7 +156,7 @@ public class ProfileController {
             }
         }
 
-        // Handle banner file upload
+        // Handle banner upload
         if (banner != null && !banner.isEmpty()) {
             try {
                 String bannerFileName = "banner_" + user.getId() + "_" + banner.getOriginalFilename();
@@ -146,27 +174,33 @@ public class ProfileController {
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Delete the current user's profile
+     * 
+     * @return ResponseEntity with success message or error
+     */
     @DeleteMapping("/delete-profile")
-public ResponseEntity<?> deleteProfile() {
-    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    String email = null;
+    public ResponseEntity<?> deleteProfile() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = null;
 
-    if (principal instanceof Jwt) {
-        email = ((Jwt) principal).getSubject();
-    } else if (principal instanceof DefaultOAuth2User) {
-        email = (String) ((DefaultOAuth2User) principal).getAttributes().get("email");
-    } else if (principal instanceof UserDetails) {
-        email = ((UserDetails) principal).getUsername();
-    } else {
-        email = principal.toString();
+        // Extract email based on authentication type
+        if (principal instanceof Jwt) {
+            email = ((Jwt) principal).getSubject();
+        } else if (principal instanceof DefaultOAuth2User) {
+            email = (String) ((DefaultOAuth2User) principal).getAttributes().get("email");
+        } else if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else {
+            email = principal.toString();
+        }
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+
+        userRepository.delete(userOpt.get());
+        return ResponseEntity.ok("User profile deleted successfully");
     }
-
-    Optional<User> userOpt = userRepository.findByEmail(email);
-    if (!userOpt.isPresent()) {
-        return ResponseEntity.badRequest().body("User not found");
-    }
-
-    userRepository.delete(userOpt.get());
-    return ResponseEntity.ok("User profile deleted successfully");
-}
 }
