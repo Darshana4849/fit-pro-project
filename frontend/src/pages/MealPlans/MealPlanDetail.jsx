@@ -154,7 +154,10 @@ const MealPlanDetail = () => {
         </div>
         
         {/* Back button to return to meal plans list */}
-        
+        <Link
+          to="/meal-plans"
+          className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+        >
           Back to Meal Plans
         </Link>
       </div>
