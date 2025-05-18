@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getWorkoutPlanById } from '../../services/workoutPlanService';
 
 const WorkoutPlanDetail = () => {
-  // Get the workout plan ID from URL parameters
+  // Get the workout plan ID from URL parameters in details
   const { id } = useParams();
   
   // State for storing the workout plan data
