@@ -267,15 +267,7 @@ const MealPlanForm = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Duration (days)*</label>
-                <input
-                  type="text"
-                  name="durationDays"
-                  value={formData.durationDays}
-                  onChange={handleDurationChange}
-                  min="1"
-                  required
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                />
+                
               </div>
 
               {/* <div className="flex items-center justify-start pt-6">
