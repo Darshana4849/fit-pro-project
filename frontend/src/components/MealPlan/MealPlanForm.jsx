@@ -158,14 +158,7 @@ const MealPlanForm = () => {
         ...formData,
         meals: [...formData.meals, { ...newMeal }],
       });
-      setNewMeal({
-        name: '',
-        description: '',
-        timeOfDay: 'Breakfast',
-        ingredients: [],
-        preparation: '',
-        calories: 500,
-      });
+      
     }
   };
 
