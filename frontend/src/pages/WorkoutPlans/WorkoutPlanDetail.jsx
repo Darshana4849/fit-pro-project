@@ -31,7 +31,7 @@ const WorkoutPlanDetail = () => {
     fetchWorkoutPlan();
   }, [id]);
 
-  // Helper function to get SVG icon based on workout type
+  // Helper function to get SVG icon based on workout type update
   const getWorkoutTypeIcon = (type) => {
     switch (type?.toLowerCase()) {
       case 'strength':
