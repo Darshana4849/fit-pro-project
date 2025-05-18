@@ -574,7 +574,12 @@ const CreateEditMealPlan = () => {
                       </ul>
                     </div>
 
-                    
+                    {meal.preparation && (
+                      <div className="mb-3">
+                        <h4 className="font-medium text-sm text-gray-300 mb-2">Preparation</h4>
+                        <p className="text-sm text-gray-300 whitespace-pre-line">{meal.preparation}</p>
+                      </div>
+                    )}
 
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-gray-300">
