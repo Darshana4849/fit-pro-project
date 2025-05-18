@@ -169,7 +169,7 @@ const WorkoutPlanDetail = () => {
             {workoutPlan.description || 'No description available.'}
           </p>
           
-          {/* Target muscles section */}
+          {/* Target muscles section update */}
           {workoutPlan.targetMuscles && workoutPlan.targetMuscles.length > 0 && (
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-900 mb-2">Target Muscles:</h3>
