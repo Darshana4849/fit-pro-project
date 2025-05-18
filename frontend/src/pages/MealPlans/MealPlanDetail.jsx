@@ -22,16 +22,7 @@ const MealPlanDetail = () => {
   useEffect(() => {
     // Async function to fetch meal plan data
     const fetchMealPlan = async () => {
-      try {
-        setLoading(true);
-        // Call service to get meal plan by ID
-        const plan = await getMealPlanById(id);
-        setMealPlan(plan); // Update state with fetched meal plan
-      } catch (err) {
-        setError(err.message); // Set error state if fetch fails
-      } finally {
-        setLoading(false); // Ensure loading state is reset regardless of success/failure
-      }
+      
     };
     fetchMealPlan();
   }, [id]); // Dependency array ensures effect runs when ID changes
