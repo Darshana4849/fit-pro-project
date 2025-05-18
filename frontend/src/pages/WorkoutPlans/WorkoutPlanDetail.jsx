@@ -187,7 +187,7 @@ const WorkoutPlanDetail = () => {
           )}
         </div>
 
-        {/* Exercises section */}
+        {/* Exercises section update */}
         <div className="px-6 py-4 border-t border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Exercises:</h2>
           
