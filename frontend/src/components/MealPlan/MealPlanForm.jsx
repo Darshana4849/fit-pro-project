@@ -447,14 +447,7 @@ const MealPlanForm = () => {
               {/* Preparation Section */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-300 mb-1">Preparation Instructions</label>
-                <textarea
-                  name="preparation"
-                  value={newMeal.preparation}
-                  onChange={handleMealInputChange}
-                  rows="3"
-                  className="w-full px-3 py-2 bg-gray-900 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
-                  placeholder="Step-by-step instructions..."
-                />
+                
               </div>
 
               <button
