@@ -169,14 +169,7 @@ const MealPlanForm = () => {
     }
   };
 
-  const removeMeal = (index) => {
-    const updatedMeals = [...formData.meals];
-    updatedMeals.splice(index, 1);
-    setFormData({
-      ...formData,
-      meals: updatedMeals,
-    });
-  };
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
