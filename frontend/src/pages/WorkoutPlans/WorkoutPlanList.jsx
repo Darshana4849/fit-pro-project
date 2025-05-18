@@ -28,7 +28,7 @@ const WorkoutPlanList = () => {
       localStorage.setItem('darkMode', prefersDark);
     }
     
-    // Apply dark mode class to body
+    // Apply dark mode class body
     if (darkMode) {
       document.body.classList.add('dark-mode');
     } else {
