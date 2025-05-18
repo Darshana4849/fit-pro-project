@@ -377,15 +377,7 @@ const CreateEditMealPlan = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Calories*</label>
-                  <input
-                    type="number"
-                    name="calories"
-                    value={newMeal.calories}
-                    onChange={handleMealInputChange}
-                    min="1"
-                    required
-                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
-                  />
+                  
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
